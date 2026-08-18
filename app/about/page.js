@@ -60,9 +60,26 @@ export default function AboutPage() {
                     {job.role}
                     <span className="text-white/50"> &middot; {job.company}</span>
                   </h3>
-                  <p className="mt-2 text-white/60 max-w-xl leading-relaxed">
-                    {job.description}
-                  </p>
+                  {job.roleHistory && (
+                    <p className="mt-1 text-sm text-white/40">{job.roleHistory}</p>
+                  )}
+                  {job.description && (
+                    <p className="mt-2 text-white/60 max-w-xl leading-relaxed">
+                      {job.description}
+                    </p>
+                  )}
+                  {job.highlights && (
+                    <ul className="mt-2 space-y-1.5 max-w-xl">
+                      {job.highlights.map((point) => (
+                        <li
+                          key={point}
+                          className="text-white/60 leading-relaxed pl-4 relative before:content-['—'] before:absolute before:left-0 before:text-white/30"
+                        >
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <span className="mt-2 sm:mt-0 sm:ml-8 shrink-0 text-right text-sm text-white/40 whitespace-nowrap">
                   <span className="block">{job.timeline}</span>
