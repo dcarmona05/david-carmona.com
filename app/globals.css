@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes doodle-spin {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.06); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes doodle-spin-reverse {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(-180deg) scale(1.06); }
+  to { transform: rotate(-360deg) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doodle-loop {
+    animation: none !important;
+  }
+}
