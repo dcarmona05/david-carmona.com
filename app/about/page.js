@@ -4,6 +4,7 @@ import PhotoFrame from '@/components/PhotoFrame';
 import TopoBackground from '@/components/TopoBackground';
 import { siteConfig } from '@/lib/site';
 import { experience, skills } from '@/lib/experience';
+import { interviews } from '@/lib/interviews';
 
 export const metadata = { title: 'About' };
 
@@ -88,6 +89,45 @@ export default function AboutPage() {
                   {job.location && <span className="block text-white/30">{job.location}</span>}
                 </span>
               </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-20">
+        <Reveal>
+          <h2 className="font-display text-2xl text-white">Interviews</h2>
+        </Reveal>
+        <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {interviews.map((item, i) => (
+            <Reveal key={item.url} delay={i * 0.06}>
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200"
+              >
+                <div className="relative aspect-video bg-white/5">
+                  <img
+                    src={item.thumbnail}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+                    <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-5 h-5 fill-black translate-x-[1px]">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-display font-medium text-white group-hover:text-accent transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-white/60">{item.show}</p>
+                </div>
+              </a>
             </Reveal>
           ))}
         </div>
