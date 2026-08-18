@@ -64,8 +64,9 @@ export default function AboutPage() {
                     {job.description}
                   </p>
                 </div>
-                <span className="mt-2 sm:mt-0 sm:ml-8 shrink-0 text-sm text-white/40 whitespace-nowrap">
-                  {job.timeline}
+                <span className="mt-2 sm:mt-0 sm:ml-8 shrink-0 text-right text-sm text-white/40 whitespace-nowrap">
+                  <span className="block">{job.timeline}</span>
+                  {job.location && <span className="block text-white/30">{job.location}</span>}
                 </span>
               </div>
             </Reveal>
