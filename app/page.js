@@ -2,12 +2,14 @@ import Link from 'next/link';
 import CaseStudyCard from '@/components/CaseStudyCard';
 import Reveal from '@/components/Reveal';
 import HeroDoodle from '@/components/HeroDoodle';
+import TopoBackground from '@/components/TopoBackground';
 import { siteConfig } from '@/lib/site';
 import { work } from '@/lib/work';
 
 export default function HomePage() {
   return (
     <div>
+      <TopoBackground />
       <Reveal>
         <section className="relative">
           <div className="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 xl:w-[28rem] xl:h-[28rem]">

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import PhotoFrame from '@/components/PhotoFrame';
+import TopoBackground from '@/components/TopoBackground';
 import { siteConfig } from '@/lib/site';
 import { experience, skills } from '@/lib/experience';
 
@@ -9,6 +10,7 @@ export const metadata = { title: 'About' };
 export default function AboutPage() {
   return (
     <div>
+      <TopoBackground />
       <Reveal>
         <div className="flex flex-col sm:flex-row items-start gap-10">
           <PhotoFrame src="/profile.jpg" alt={siteConfig.name} />
