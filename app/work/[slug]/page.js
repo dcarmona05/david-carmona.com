@@ -4,6 +4,8 @@ import Reveal from '@/components/Reveal';
 import AbstractVisual from '@/components/AbstractVisual';
 import ProcessSteps from '@/components/ProcessSteps';
 import FocusAreas from '@/components/FocusAreas';
+import AudienceArchetypes from '@/components/AudienceArchetypes';
+import VideoDemo from '@/components/VideoDemo';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
 export function generateStaticParams() {
@@ -58,8 +60,17 @@ export default function CaseStudyPage({ params }) {
         </p>
       </Reveal>
 
+      <Reveal delay={0.05}>
+        <section className="mt-16">
+          <h2 className="font-display text-xl text-white">Watch It In Action</h2>
+          <div className="mt-6 max-w-3xl">
+            <VideoDemo videoUrl={item.videoUrl} />
+          </div>
+        </section>
+      </Reveal>
+
       {item.overview && (
-        <Reveal delay={0.05}>
+        <Reveal delay={0.07}>
           <section className="mt-16 grid lg:grid-cols-2 gap-8 items-start">
             <div>
               <h2 className="font-display text-xl text-white">Overview</h2>
@@ -71,6 +82,18 @@ export default function CaseStudyPage({ params }) {
       )}
 
       <Reveal delay={0.08}>
+        <section className="mt-16">
+          <h2 className="font-display text-xl text-white">Who This Serves</h2>
+          <p className="mt-2 text-sm text-white/40 max-w-2xl">
+            Typical archetypes for this category of work — illustrative, not the literal validated research for this specific project.
+          </p>
+          <div className="mt-6">
+            <AudienceArchetypes category={item.category} />
+          </div>
+        </section>
+      </Reveal>
+
+      <Reveal delay={0.09}>
         <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
           <h2 className="font-display text-xl text-white">Focus Areas</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
