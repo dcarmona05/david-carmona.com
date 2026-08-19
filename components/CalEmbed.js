@@ -44,7 +44,7 @@ export default function CalEmbed() {
         };
     })(window, 'https://app.cal.com/embed/embed.js', 'init');
 
-    window.Cal('init', CAL_NAMESPACE, { origin: 'https://cal.com' });
+    window.Cal('init', CAL_NAMESPACE, { calOrigin: 'https://cal.com' });
 
     window.Cal.ns[CAL_NAMESPACE]('inline', {
       elementOrSelector: containerRef.current,

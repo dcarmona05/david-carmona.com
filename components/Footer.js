@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { siteConfig } from '@/lib/site';
 
 export default function Footer() {
@@ -8,7 +9,7 @@ export default function Footer() {
         <div className="flex gap-6">
           <a href={siteConfig.github} className="hover:text-accent transition-colors">GitHub</a>
           <a href={siteConfig.linkedin} className="hover:text-accent transition-colors">LinkedIn</a>
-          <a href={`mailto:${siteConfig.email}`} className="hover:text-accent transition-colors">Email</a>
+          <Link href="/contact" className="hover:text-accent transition-colors">Contact</Link>
         </div>
       </div>
     </footer>
