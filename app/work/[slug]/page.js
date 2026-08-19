@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Reveal from '@/components/Reveal';
 import AbstractVisual from '@/components/AbstractVisual';
 import ProcessSteps from '@/components/ProcessSteps';
+import FocusAreas from '@/components/FocusAreas';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
 export function generateStaticParams() {
@@ -68,6 +69,18 @@ export default function CaseStudyPage({ params }) {
           </section>
         </Reveal>
       )}
+
+      <Reveal delay={0.08}>
+        <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
+          <h2 className="font-display text-xl text-white">Focus Areas</h2>
+          <p className="mt-2 text-sm text-white/40 max-w-2xl">
+            General considerations for this category of work — not a checklist of what this specific project did or didn’t include.
+          </p>
+          <div className="mt-6">
+            <FocusAreas category={item.category} />
+          </div>
+        </section>
+      </Reveal>
 
       <Reveal delay={0.1}>
         <section className="mt-16">
