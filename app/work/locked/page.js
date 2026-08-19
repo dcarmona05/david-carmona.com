@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 function LockedForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,8 +26,7 @@ function LockedForm() {
       }
 
       const next = searchParams.get('next') || '/work';
-      router.push(next);
-      router.refresh();
+      window.location.href = next;
     } catch (err) {
       setError(err.message);
       setLoading(false);
