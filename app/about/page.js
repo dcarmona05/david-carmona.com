@@ -6,7 +6,10 @@ import { siteConfig } from '@/lib/site';
 import { experience, skills } from '@/lib/experience';
 import { interviews } from '@/lib/interviews';
 
-export const metadata = { title: 'About' };
+export const metadata = {
+  title: 'About',
+  description: 'Principal Designer at ServiceNow, previously LinkedIn — experience, skills, and background.',
+};
 
 export default function AboutPage() {
   return (

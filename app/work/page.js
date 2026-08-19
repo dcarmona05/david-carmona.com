@@ -2,7 +2,10 @@ import CaseStudyCard from '@/components/CaseStudyCard';
 import Reveal from '@/components/Reveal';
 import { work } from '@/lib/work';
 
-export const metadata = { title: 'Work' };
+export const metadata = {
+  title: 'Work',
+  description: 'A selection of design systems, product design, and design operations projects.',
+};
 
 export default function WorkPage() {
   return (

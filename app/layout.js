@@ -12,8 +12,24 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = {
-  title: `${siteConfig.name} — ${siteConfig.role}`,
+  metadataBase: new URL(siteConfig.siteUrl),
+  title: {
+    default: `${siteConfig.name} — ${siteConfig.role}`,
+    template: `%s — ${siteConfig.name}`,
+  },
   description: siteConfig.tagline,
+  openGraph: {
+    title: `${siteConfig.name} — ${siteConfig.role}`,
+    description: siteConfig.tagline,
+    url: siteConfig.siteUrl,
+    siteName: siteConfig.name,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${siteConfig.name} — ${siteConfig.role}`,
+    description: siteConfig.tagline,
+  },
 };
 
 export default function RootLayout({ children }) {

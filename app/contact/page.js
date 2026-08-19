@@ -3,7 +3,10 @@ import ContactForm from '@/components/ContactForm';
 import CalEmbed from '@/components/CalEmbed';
 import TopoBackground from '@/components/TopoBackground';
 
-export const metadata = { title: 'Contact' };
+export const metadata = {
+  title: 'Contact',
+  description: 'Get in touch about a project, a role, or just to talk design.',
+};
 
 export default function ContactPage() {
   return (
