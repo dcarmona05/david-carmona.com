@@ -6,6 +6,7 @@ import ProcessSteps from '@/components/ProcessSteps';
 import FocusAreas from '@/components/FocusAreas';
 import AudienceArchetypes from '@/components/AudienceArchetypes';
 import VideoDemo from '@/components/VideoDemo';
+import RoleResponsibilities from '@/components/RoleResponsibilities';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
 export function generateStaticParams() {
@@ -58,6 +59,15 @@ export default function CaseStudyPage({ params }) {
         <p className="mt-8 max-w-2xl text-lg text-white/70 leading-relaxed">
           {item.description}
         </p>
+      </Reveal>
+
+      <Reveal delay={0.04}>
+        <section className="mt-16">
+          <h2 className="font-display text-xl text-white">My Role &amp; Responsibilities</h2>
+          <div className="mt-6 max-w-2xl">
+            <RoleResponsibilities role={item.role} responsibilities={item.responsibilities} />
+          </div>
+        </section>
       </Reveal>
 
       <Reveal delay={0.05}>
