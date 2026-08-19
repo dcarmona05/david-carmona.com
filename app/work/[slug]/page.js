@@ -84,7 +84,7 @@ export default function CaseStudyPage({ params }) {
       {item.outcome && (
         <Reveal delay={0.15}>
           <section className="mt-16">
-            <h2 className="font-display text-xl text-white">Outcome</h2>
+            <h2 className="font-display text-xl text-white">Outputs &amp; Impact</h2>
             <blockquote className="mt-4 max-w-2xl border-l-2 border-accent pl-6">
               <p className="font-display text-xl sm:text-2xl text-white leading-snug">
                 {item.outcome}
