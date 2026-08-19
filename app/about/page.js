@@ -108,7 +108,7 @@ export default function AboutPage() {
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200"
+                className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <div className="relative aspect-video bg-white/5">
                   <img
@@ -127,6 +127,7 @@ export default function AboutPage() {
                 <div className="p-4">
                   <h3 className="font-display font-medium text-white group-hover:text-accent transition-colors">
                     {item.title}
+                    <span className="sr-only"> (opens in new tab)</span>
                   </h3>
                   <p className="mt-1 text-sm text-white/60">{item.show}</p>
                 </div>

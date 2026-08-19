@@ -99,7 +99,7 @@ export default function ContactForm() {
       </div>
 
       {status === 'error' && (
-        <p className="text-sm text-accent">{error}</p>
+        <p role="alert" className="text-sm text-accent">{error}</p>
       )}
 
       <button

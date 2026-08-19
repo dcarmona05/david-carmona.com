@@ -4,7 +4,7 @@ export default function CaseStudyCard({ item }) {
   return (
     <Link
       href={`/work/${item.slug}`}
-      className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200"
+      className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <div className={`aspect-[4/3] bg-gradient-to-br ${item.accent} flex items-end p-4`}>
         <span className="text-white/80 text-xs uppercase tracking-wide">

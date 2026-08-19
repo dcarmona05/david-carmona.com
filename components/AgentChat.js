@@ -55,7 +55,12 @@ function ChatHeader({ onMinimize, onExpand, onClose, isFull }) {
 
 function ChatBody({ messages, loading, scrollRef }) {
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+    <div
+      role="log"
+      aria-live="polite"
+      aria-label="Chat messages"
+      className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+    >
       {messages.map((m, i) => (
         <div
           key={i}
@@ -106,6 +111,15 @@ export default function AgentChat() {
     if (messages.length === 0) return;
     scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages]);
+
+  useEffect(() => {
+    if (view !== 'full') return;
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') setView('docked');
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [view]);
 
   async function sendMessage(e) {
     e.preventDefault();
