@@ -3,6 +3,7 @@ import { Space_Grotesk } from 'next/font/google';
 import { MotionConfig } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AgentChat from '@/components/AgentChat';
 import { siteConfig } from '@/lib/site';
 
 const spaceGrotesk = Space_Grotesk({
@@ -42,6 +43,7 @@ export default function RootLayout({ children }) {
             {children}
           </main>
           <Footer />
+          <AgentChat />
         </MotionConfig>
       </body>
     </html>
