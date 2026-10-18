@@ -8,6 +8,8 @@ import {
   deleteComment,
   flagItem,
   countFlags,
+  loadLocalComments,
+  saveLocalComments,
   MAX_COMMENT_LENGTH,
   FLAG_HIDE_THRESHOLD,
 } from '@/lib/canvasSync';
@@ -27,6 +29,16 @@ const REGIONS = [
  * the "Comments · N" affordance jessa.art has. Opened/closed by
  * CollabToolbar; `onCountChange` reports the live total back up so the
  * toolbar's count stays correct even while this panel is closed.
+ *
+ * Redesigned per feedback: rendered as CollabToolbar's `children` (see
+ * that component) so it stacks as a drop-up directly above the toolbar at
+ * whatever height the toolbar actually is, instead of a separate
+ * top-right card with its own independently-guessed fixed position. It
+ * owns no positioning of its own, only the card's own layout. Region
+ * association is automatic from `activeRegion` (which CanvasStage now
+ * tracks continuously during free panning, not just on a CanvasNav click
+ * or keyboard focus) instead of a manual page-picker — you were never
+ * choosing anything CanvasNav/the camera didn't already know.
  */
 export default function CommentsPanel({ open, onClose, activeRegion, onCountChange }) {
   const [remoteComments, setRemoteComments] = useState({});
@@ -35,11 +47,27 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
   const [myUid, setMyUid] = useState(null);
   const [flaggedByMe, setFlaggedByMe] = useState(() => new Set());
   const [draftText, setDraftText] = useState('');
-  const [draftRegion, setDraftRegion] = useState(activeRegion || 'home');
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     ensureAnonymousAuth().then(setMyUid);
   }, []);
+
+  // See CollabLayer's identical pattern/comment -- loaded post-mount, not
+  // in a lazy useState initializer, to avoid a hydration mismatch against
+  // the server's always-empty render.
+  useEffect(() => {
+    const cached = loadLocalComments();
+    if (Object.keys(cached).length) {
+      setLocalComments((prev) => ({ ...cached, ...prev }));
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    saveLocalComments(localComments);
+  }, [hydrated, localComments]);
 
   useEffect(() => {
     const unsub = subscribeToComments(({ items }) => setRemoteComments(items || {}));
@@ -47,10 +75,6 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
   }, []);
 
   useEffect(() => subscribeToFlags(({ items }) => setFlags(items || {})), []);
-
-  useEffect(() => {
-    if (activeRegion) setDraftRegion(activeRegion);
-  }, [activeRegion]);
 
   const comments = { ...localComments, ...remoteComments };
 
@@ -70,6 +94,9 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
     })
     .sort(([, a], [, b]) => (b.createdAt || 0) - (a.createdAt || 0));
 
+  const regionId = activeRegion || 'home';
+  const regionLabel = REGIONS.find((r) => r.id === regionId)?.label || regionId;
+
   async function handleSubmit(e) {
     e.preventDefault();
     const text = draftText.trim();
@@ -79,20 +106,29 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
 
     // Local-optimistic, same reconciliation pattern as CollabLayer's canvas
     // elements: show it immediately, and if the write actually reaches
-    // Firebase, re-key it under the real id so the eventual remote echo
-    // doesn't render as a duplicate.
+    // Firebase, drop the local-only copy (not re-key it) once the remote
+    // subscription will deliver the real one.
     const tempId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const payload = { regionId: draftRegion, text, authorNickname: identity.nickname, createdAt: Date.now() };
+    const payload = {
+      regionId,
+      text,
+      authorNickname: identity.nickname,
+      authorColor: identity.color,
+      createdAt: Date.now(),
+    };
     setLocalComments((prev) => ({ ...prev, [tempId]: payload }));
 
-    const result = await createComment({ regionId: draftRegion, text, authorNickname: identity.nickname });
+    const result = await createComment({
+      regionId,
+      text,
+      authorNickname: identity.nickname,
+      authorColor: identity.color,
+    });
     if (result.ok && result.id) {
       setLocalComments((prev) => {
         if (!(tempId in prev)) return prev;
         const next = { ...prev };
-        const data = next[tempId];
         delete next[tempId];
-        next[result.id] = data;
         return next;
       });
     }
@@ -118,7 +154,7 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
     <div
       role="dialog"
       aria-label="Comments"
-      className="fixed top-20 right-4 sm:right-6 z-40 w-[calc(100vw-2rem)] sm:w-80 max-h-[70vh] flex flex-col rounded-xl border border-border/10 bg-bg shadow-xl"
+      className="w-[calc(100vw-2rem)] sm:w-96 max-h-[55vh] flex flex-col rounded-2xl border border-border/10 bg-bg shadow-xl"
     >
       <div className="flex items-center justify-between px-4 py-3 border-b border-border/10 shrink-0">
         <span className="font-display font-medium text-fg text-sm">Comments</span>
@@ -132,15 +168,21 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
         {list.map(([id, comment]) => {
           const isLocalOnly = id in localComments && !(id in remoteComments);
           const canModerate = isLocalOnly || (myUid && (comment.authorUid === myUid || myUid === OWNER_UID));
-          const regionLabel = REGIONS.find((r) => r.id === comment.regionId)?.label || comment.regionId;
+          const label = REGIONS.find((r) => r.id === comment.regionId)?.label || comment.regionId;
           return (
-            <div key={id} className="group relative rounded-lg border border-border/10 p-3">
-              <div className="flex items-baseline justify-between gap-2">
-                <span className="text-xs font-medium text-fg/70">{comment.authorNickname || 'Someone'}</span>
-                <span className="text-[10px] uppercase tracking-wide text-fg/30">{regionLabel}</span>
+            <div key={id} className="group flex items-start gap-2.5">
+              <span
+                className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
+                style={{ backgroundColor: comment.authorColor || 'rgb(var(--color-accent))' }}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xs font-medium text-fg/80">{comment.authorNickname || 'Someone'}</span>
+                  <span className="text-[10px] text-fg/30">· {label}</span>
+                </div>
+                <p className="mt-0.5 text-sm text-fg/80 break-words">{comment.text}</p>
               </div>
-              <p className="mt-1 text-sm text-fg/80 break-words">{comment.text}</p>
-              <span className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+              <span className="flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity shrink-0">
                 {canModerate && (
                   <button
                     type="button"
@@ -167,18 +209,11 @@ export default function CommentsPanel({ open, onClose, activeRegion, onCountChan
         })}
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-border/10 p-3 shrink-0 space-y-2">
-        <select
-          value={draftRegion}
-          onChange={(e) => setDraftRegion(e.target.value)}
-          className="w-full text-xs rounded-md border border-border/15 bg-surface/5 px-2 py-1.5 text-fg"
-        >
-          {REGIONS.map((r) => (
-            <option key={r.id} value={r.id}>
-              On: {r.label}
-            </option>
-          ))}
-        </select>
+      <form onSubmit={handleSubmit} className="border-t border-border/10 p-3 shrink-0 space-y-1.5">
+        <p className="text-[11px] text-fg/40 px-0.5">
+          Commenting on <span className="text-fg/60 font-medium">{regionLabel}</span> — follows wherever you are on
+          the canvas
+        </p>
         <div className="flex gap-2">
           <input
             type="text"

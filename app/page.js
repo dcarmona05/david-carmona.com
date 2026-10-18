@@ -285,14 +285,14 @@ export default function HomePage() {
         stickerPickerOpen={activeTool === 'sticker'}
         onSelectSticker={setPendingSticker}
         pendingSticker={pendingSticker}
-      />
-
-      <CommentsPanel
-        open={commentsOpen}
-        onClose={() => setCommentsOpen(false)}
-        activeRegion={activeRegion}
-        onCountChange={setCommentCount}
-      />
+      >
+        <CommentsPanel
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+          activeRegion={activeRegion}
+          onCountChange={setCommentCount}
+        />
+      </CollabToolbar>
     </>
   );
 }

@@ -28,12 +28,21 @@ export default function CollabToolbar({
   stickerPickerOpen,
   onSelectSticker,
   pendingSticker,
+  children,
 }) {
   return (
     // Docked higher up on narrow screens so it never shares horizontal
     // space with AgentChat's bottom-right bubble — at sm+ there's enough
-    // width for both side by side.
+    // width for both side by side. CommentsPanel renders as `children`
+    // here (not its own independently-positioned fixed element) so it
+    // stacks directly above the toolbar at whatever height the toolbar
+    // actually ends up — the offline banner and sticker picker already
+    // grow this same column upward, rather than needing a guessed pixel
+    // offset that breaks the moment the toolbar's own height changes
+    // (exactly what happened on mobile, where it wraps to two rows).
     <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
+      {children}
+
       {!isLive && (
         <p className="rounded-full bg-bg/90 border border-border/10 backdrop-blur-md px-3 py-1 text-[11px] text-fg/50 shadow-sm">
           Collaboration is offline right now — your drawings stay local to you

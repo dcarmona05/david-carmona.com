@@ -215,6 +215,36 @@ const CanvasStage = forwardRef(function CanvasStage(
     [onPointerPositionChange, screenToWorld]
   );
 
+  // "Which region is active" has to stay correct during free drag/wheel
+  // panning too, not just on a CanvasNav click or keyboard focus-follow --
+  // CommentsPanel auto-tags a new comment with whatever's currently in
+  // view, so a scroll-spy-style check (same TOP_MARGIN line panToRegion
+  // itself aligns a region's top to) runs on every transform update.
+  // Never calls panToRegion itself -- that would fight the user's own
+  // drag -- only reports which region that drag/scroll already put at
+  // the top, same ref the focus-follow effect above reads/writes so the
+  // two never disagree about "where we currently are."
+  const handleTransformed = useCallback(() => {
+    if (!onActiveRegionChange) return;
+    const wrapperEl = innerRef.current?.instance?.wrapperComponent;
+    if (!wrapperEl) return;
+    const wrapperRect = wrapperEl.getBoundingClientRect();
+    const frames = wrapperEl.querySelectorAll('[data-canvas-frame]');
+    let candidate = null;
+    let candidateTop = -Infinity;
+    frames.forEach((el) => {
+      const top = el.getBoundingClientRect().top - wrapperRect.top;
+      if (top <= TOP_MARGIN + 60 && top > candidateTop) {
+        candidateTop = top;
+        candidate = el.getAttribute('data-canvas-frame');
+      }
+    });
+    if (candidate && candidate !== lastFocusedRegionRef.current) {
+      lastFocusedRegionRef.current = candidate;
+      onActiveRegionChange(candidate);
+    }
+  }, [onActiveRegionChange]);
+
   return (
     <div
       ref={wrapperRef}
@@ -240,6 +270,7 @@ const CanvasStage = forwardRef(function CanvasStage(
         // setTransform directly, which this does NOT constrain, so jumping
         // between regions is unaffected.
         limitToBounds
+        onTransformed={handleTransformed}
         // wheelDisabled + wheelPanning (below) is the Figma convention:
         // a plain scroll/two-finger swipe pans instead of zooming; a real
         // pinch gesture still zooms, since trackpads report that as a
