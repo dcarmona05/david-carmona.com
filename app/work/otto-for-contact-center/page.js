@@ -4,6 +4,7 @@ import Reveal from '@/components/Reveal';
 import HeroVideo from '@/components/HeroVideo';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
+import ViewTracker from '@/components/ViewTracker';
 import PageShell from '@/components/PageShell';
 import { getWorkBySlug, getNextWork } from '@/lib/work';
 
@@ -82,6 +83,7 @@ export default function OttoCaseStudyPage() {
   return (
     <PageShell>
     <div>
+      <ViewTracker slug={item.slug} />
       <Reveal>
         <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
           &larr; All work

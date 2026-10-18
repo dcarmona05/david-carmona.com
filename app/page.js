@@ -11,7 +11,7 @@ import PresenceCursors from '@/components/canvas/PresenceCursors';
 import VisitorAvatars from '@/components/canvas/VisitorAvatars';
 import VisitCounter from '@/components/canvas/VisitCounter';
 import Frame from '@/components/canvas/Frame';
-import CaseStudyCard from '@/components/CaseStudyCard';
+import WorkGrid from '@/components/WorkGrid';
 import ContactForm from '@/components/ContactForm';
 import HeroDoodle from '@/components/HeroDoodle';
 import PhotoFrame from '@/components/PhotoFrame';
@@ -90,10 +90,8 @@ function RegionContent({ id }) {
             View all &rarr;
           </Link>
         </div>
-        <div className="mt-6 grid sm:grid-cols-2 gap-6">
-          {work.map((item) => (
-            <CaseStudyCard key={item.slug} item={item} />
-          ))}
+        <div className="mt-6">
+          <WorkGrid items={work} className="grid sm:grid-cols-2 gap-6" />
         </div>
       </div>
     );

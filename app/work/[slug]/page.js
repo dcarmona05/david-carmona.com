@@ -9,6 +9,7 @@ import ScreenshotGallery from '@/components/ScreenshotGallery';
 import VideoDemo from '@/components/VideoDemo';
 import VideoGallery from '@/components/VideoGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
+import ViewTracker from '@/components/ViewTracker';
 import PageShell from '@/components/PageShell';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
@@ -35,6 +36,7 @@ export default function CaseStudyPage({ params }) {
   return (
     <PageShell>
     <div>
+      <ViewTracker slug={item.slug} />
       <Reveal>
         <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
           &larr; All work

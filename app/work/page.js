@@ -1,5 +1,5 @@
-import CaseStudyCard from '@/components/CaseStudyCard';
 import Reveal from '@/components/Reveal';
+import WorkGrid from '@/components/WorkGrid';
 import PageShell from '@/components/PageShell';
 import { work } from '@/lib/work';
 
@@ -18,12 +18,8 @@ export default function WorkPage() {
             A selection of projects spanning design systems, product design, and design operations.
           </p>
         </Reveal>
-        <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {work.map((item, i) => (
-            <Reveal key={item.slug} delay={i * 0.06}>
-              <CaseStudyCard item={item} />
-            </Reveal>
-          ))}
+        <div className="mt-10">
+          <WorkGrid items={work} reveal />
         </div>
       </div>
     </PageShell>
