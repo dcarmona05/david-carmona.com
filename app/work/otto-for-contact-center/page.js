@@ -107,8 +107,8 @@ export default function OttoCaseStudyPage() {
       </Reveal>
 
       <Reveal delay={0.04}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">My Role &amp; Responsibilities</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">My Role &amp; Responsibilities</h2>
           <div className="mt-6 max-w-2xl">
             <RoleResponsibilities role={item.role} responsibilities={item.responsibilities} />
           </div>
@@ -116,8 +116,8 @@ export default function OttoCaseStudyPage() {
       </Reveal>
 
       <Reveal delay={0.05}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">Watch It In Action</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">Watch It In Action</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             A 2:30 concept film of the experience, written and directed for ServiceNow&apos;s VP and
             Director-level Design and Product leadership.
@@ -130,8 +130,8 @@ export default function OttoCaseStudyPage() {
 
       {/* Who it's for */}
       <Reveal delay={0.06}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">Who This Is For</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">Who This Is For</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             The demo scenario&apos;s persona, used to walk through the experience end-to-end.
           </p>
@@ -159,9 +159,9 @@ export default function OttoCaseStudyPage() {
 
       {/* What it is */}
       <Reveal delay={0.07}>
-        <section className="mt-16 grid lg:grid-cols-2 gap-8">
+        <section className="mt-20 pt-10 border-t border-white/10 grid lg:grid-cols-2 gap-8">
           <div>
-            <h2 className="font-display text-xl text-white">What It Is</h2>
+            <h2 className="font-display text-2xl font-bold text-white">What It Is</h2>
             <p className="mt-3 text-white/70 leading-relaxed">{item.overview}</p>
             <div className="mt-6 rounded-lg border border-white/10 overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -192,8 +192,8 @@ export default function OttoCaseStudyPage() {
 
       {/* Why we built it */}
       <Reveal delay={0.08}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">Why We Built It</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">Why We Built It</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             Most AI copilots bolt onto an existing, form-first workspace as one more card. A live call
             doesn&apos;t work that way.
@@ -224,7 +224,7 @@ export default function OttoCaseStudyPage() {
       {/* One conversation, four tracks at once */}
       <Reveal delay={0.09}>
         <section className="mt-16">
-          <h3 className="font-display text-lg text-white">One Conversation, Four Tracks at Once</h3>
+          <h3 className="font-display text-xl font-semibold text-white">One Conversation, Four Tracks at Once</h3>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             Customer, Otto, and the banker are all moving at the same time &mdash; and the customer
             doesn&apos;t follow a script.
@@ -241,7 +241,7 @@ export default function OttoCaseStudyPage() {
       {/* Same call without Otto */}
       <Reveal delay={0.1}>
         <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
-          <h3 className="font-display text-lg text-white">The Same Call, Without Otto</h3>
+          <h3 className="font-display text-xl font-semibold text-white">The Same Call, Without Otto</h3>
           <p className="mt-3 text-white/70 leading-relaxed">
             Walking the same scenario without Otto takes more screens and more holds: the banker
             switches between a profile, accounts, check search, deposits, and a policy doc by hand,
@@ -257,8 +257,8 @@ export default function OttoCaseStudyPage() {
 
       {/* Why this matters - external research */}
       <Reveal delay={0.11}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">Why This Matters</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">Why This Matters</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             Independent research on generative AI assistance in customer-facing roles &mdash; the
             broader case this design direction responds to, not a measured result of this prototype.
@@ -279,8 +279,8 @@ export default function OttoCaseStudyPage() {
 
       {/* How it's built */}
       <Reveal delay={0.12}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">How It&apos;s Built</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">How It&apos;s Built</h2>
           <div className="mt-6 flex flex-wrap items-center gap-3 text-sm">
             <span className="rounded-full border border-white/15 px-4 py-1.5 text-white/70">LLM <span className="text-white/35">thinks</span></span>
             <span className="text-white/25">&rarr;</span>
@@ -309,8 +309,8 @@ export default function OttoCaseStudyPage() {
 
       {/* What we learned */}
       <Reveal delay={0.13}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">What We Learned From the Study</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">What We Learned From the Study</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">
             Real findings from banker research sessions run on this prototype over Zoom.
           </p>
@@ -348,8 +348,8 @@ export default function OttoCaseStudyPage() {
 
       {/* Where it lives */}
       <Reveal delay={0.14}>
-        <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
-          <h2 className="font-display text-xl text-white">Where It Lives, and Why</h2>
+        <section className="mt-20 rounded-lg border border-white/10 p-6 sm:p-8">
+          <h2 className="font-display text-2xl font-bold text-white">Where It Lives, and Why</h2>
           <p className="mt-3 text-white/70 leading-relaxed">
             Otto for Contact Center is a desktop experience, not a mobile one. A banker on a live call
             needs the transcript, the call script, and the Customer 360 view open at once on a wide
@@ -362,8 +362,8 @@ export default function OttoCaseStudyPage() {
 
       {/* Product Walkthrough */}
       <Reveal delay={0.15}>
-        <section className="mt-16">
-          <h2 className="font-display text-xl text-white">Product Walkthrough</h2>
+        <section className="mt-20 pt-10 border-t border-white/10">
+          <h2 className="font-display text-2xl font-bold text-white">Product Walkthrough</h2>
           <p className="mt-2 text-sm text-white/40 max-w-2xl">Real screens from the working prototype.</p>
           <div className="mt-6">
             <ScreenshotGallery screenshots={item.screenshots} />
@@ -373,8 +373,8 @@ export default function OttoCaseStudyPage() {
 
       {item.outcome && (
         <Reveal delay={0.16}>
-          <section className="mt-16">
-            <h2 className="font-display text-xl text-white">Outputs &amp; Impact</h2>
+          <section className="mt-20 pt-10 border-t border-white/10">
+            <h2 className="font-display text-2xl font-bold text-white">Outputs &amp; Impact</h2>
             <blockquote className="mt-4 max-w-2xl border-l-2 border-accent pl-6">
               <p className="font-display text-xl sm:text-2xl text-white leading-snug">{item.outcome}</p>
             </blockquote>
