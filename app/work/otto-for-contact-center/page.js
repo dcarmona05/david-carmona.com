@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
-import VideoDemo from '@/components/VideoDemo';
+import HeroVideo from '@/components/HeroVideo';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
 import { getWorkBySlug, getNextWork } from '@/lib/work';
@@ -86,14 +86,12 @@ export default function OttoCaseStudyPage() {
         </Link>
 
         <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={item.heroImage}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover object-top"
-          />
+          <HeroVideo src={item.videoUrl} poster={item.heroImage} />
         </div>
+        <p className="mt-2 text-xs text-white/35">
+          A 2:30 concept film of the experience, written and directed for ServiceNow&apos;s VP and
+          Director-level Design and Product leadership.
+        </p>
 
         <div className="mt-6">
           <span className="text-xs uppercase tracking-wide text-white/50 bg-white/5 rounded-full px-3 py-1">
@@ -111,19 +109,6 @@ export default function OttoCaseStudyPage() {
           <h2 className="font-display text-2xl font-bold text-white">My Role &amp; Responsibilities</h2>
           <div className="mt-6 max-w-2xl">
             <RoleResponsibilities role={item.role} responsibilities={item.responsibilities} />
-          </div>
-        </section>
-      </Reveal>
-
-      <Reveal delay={0.05}>
-        <section className="mt-20 pt-10 border-t border-white/10">
-          <h2 className="font-display text-2xl font-bold text-white">Watch It In Action</h2>
-          <p className="mt-2 text-sm text-white/40 max-w-2xl">
-            A 2:30 concept film of the experience, written and directed for ServiceNow&apos;s VP and
-            Director-level Design and Product leadership.
-          </p>
-          <div className="mt-6 max-w-3xl">
-            <VideoDemo videoUrl={item.videoUrl} />
           </div>
         </section>
       </Reveal>
