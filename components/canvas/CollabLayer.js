@@ -8,20 +8,79 @@ import {
   deleteElement,
   flagItem,
   countFlags,
+  loadLocalElements,
+  saveLocalElements,
   MAX_PEN_POINTS,
   MAX_TEXT_LENGTH,
   FLAG_HIDE_THRESHOLD,
+  TEXT_SIZES,
+  TEXT_FONTS,
 } from '@/lib/canvasSync';
-import { getIdentity } from '@/lib/identity';
+import { getIdentity, IDENTITY_COLORS } from '@/lib/identity';
 import { ensureAnonymousAuth } from '@/lib/firebase';
 
 const OWNER_UID = process.env.NEXT_PUBLIC_CANVAS_OWNER_UID || null;
 const PEN_MIN_POINT_DISTANCE = 4;
-const DEFAULT_FRAME_SIZE = { width: 220, height: 140 };
+const MIN_FRAME_SIZE = { width: 80, height: 60 };
 
 function pointsToPath(points) {
   if (!points?.length) return '';
   return points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x},${y}`).join(' ');
+}
+
+function textSizeClass(id) {
+  return TEXT_SIZES.find((s) => s.id === id)?.className || TEXT_SIZES[1].className;
+}
+
+function textFontClass(id) {
+  return TEXT_FONTS.find((f) => f.id === id)?.className || TEXT_FONTS[0].className;
+}
+
+// Shared by both the frame "label it" popover and the text tool's style
+// popover — a small swatch row reusing the fixed 6-color identity palette
+// (lib/identity.js), deliberately not a freeform color picker (see
+// CANVAS_REBUILD.md's moderation design rationale).
+function ColorSwatches({ value, onChange }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {IDENTITY_COLORS.map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          aria-label={`Color ${c}`}
+          aria-pressed={value === c}
+          className={`w-5 h-5 rounded-full ring-2 ring-offset-2 ring-offset-bg transition-shadow ${
+            value === c ? 'ring-fg' : 'ring-transparent'
+          }`}
+          style={{ backgroundColor: c }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SegmentedPicker({ options, value, onChange, labelPrefix }) {
+  return (
+    <div className="flex items-center gap-1">
+      {options.map((opt) => (
+        <button
+          key={opt.id}
+          type="button"
+          onClick={() => onChange(opt.id)}
+          aria-label={`${labelPrefix} ${opt.label}`}
+          aria-pressed={value === opt.id}
+          className={`px-2 py-1 text-[11px] rounded-md border transition-colors ${
+            value === opt.id
+              ? 'border-accent bg-accent/10 text-fg'
+              : 'border-border/15 text-fg/50 hover:text-fg'
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 /**
@@ -40,14 +99,38 @@ const CollabLayer = forwardRef(function CollabLayer(
   const [flags, setFlags] = useState({});
   const [myUid, setMyUid] = useState(null);
   const [flaggedByMe, setFlaggedByMe] = useState(() => new Set());
-  const [draft, setDraft] = useState(null); // { tool, x, y, text }
+  // Text tool: click-to-place, with its style options in the same step.
+  const [textDraft, setTextDraft] = useState(null); // { x, y, text, color, size, font }
+  // Frame tool: draw-to-size first ('drawing'), then a label/color step
+  // ('editing') -- per David's explicit ask, not naming it before it's drawn.
+  const [frameDraft, setFrameDraft] = useState(null);
+  const [stickerGhost, setStickerGhost] = useState(null); // { x, y } — follows the cursor pre-placement
   const [drawingId, setDrawingId] = useState(null);
   const identityRef = useRef(null);
+  const hydratedLocalRef = useRef(false);
 
   useEffect(() => {
     identityRef.current = getIdentity();
     ensureAnonymousAuth().then(setMyUid);
   }, []);
+
+  // Load this browser's own not-yet-synced elements after mount (not in a
+  // lazy useState initializer) -- reading localStorage during the client's
+  // first render would disagree with the server's always-empty render, the
+  // same hydration-mismatch class of bug already documented for presence
+  // identity. Safe to merge in after mount since this is strictly additive.
+  useEffect(() => {
+    const cached = loadLocalElements();
+    if (Object.keys(cached).length) {
+      setLocalElements((prev) => ({ ...cached, ...prev }));
+    }
+    hydratedLocalRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedLocalRef.current) return;
+    saveLocalElements(localElements);
+  }, [localElements]);
 
   useEffect(() => {
     const unsub = subscribeToElements(({ status, items }) => {
@@ -67,12 +150,14 @@ const CollabLayer = forwardRef(function CollabLayer(
       authorNickname: identity.nickname,
     });
     if (result.ok && result.id) {
+      // Once it's really synced, the remote subscription will deliver it
+      // under its real id -- drop the local-only copy entirely instead of
+      // re-keying it, so it doesn't linger forever as dead state (and dead
+      // localStorage weight) once Firebase is actually reachable.
       setLocalElements((prev) => {
         if (!(tempId in prev)) return prev;
         const next = { ...prev };
-        const data = next[tempId];
         delete next[tempId];
-        next[result.id] = data;
         return next;
       });
     }
@@ -95,20 +180,19 @@ const CollabLayer = forwardRef(function CollabLayer(
   const handlePointerDown = useCallback(
     ({ x, y }) => {
       if (activeTool === 'frame') {
-        setDraft({
-          tool: 'frame',
-          x: x - DEFAULT_FRAME_SIZE.width / 2,
-          y: y - DEFAULT_FRAME_SIZE.height / 2,
-          text: '',
-        });
+        // Only start a new box if one isn't already being drawn/labeled --
+        // the in-progress one has to be confirmed or cancelled first.
+        setFrameDraft((prev) => prev ?? { phase: 'drawing', startX: x, startY: y, x, y, width: 0, height: 0 });
         return;
       }
       if (activeTool === 'text') {
-        setDraft({ tool: 'text', x, y, text: '' });
+        const identity = identityRef.current || getIdentity();
+        setTextDraft((prev) => prev ?? { x, y, text: '', color: identity.color, size: 'md', font: 'sans' });
         return;
       }
       if (activeTool === 'sticker' && pendingSticker) {
         placeElement({ type: 'sticker', stickerId: pendingSticker, x, y });
+        setStickerGhost(null);
         onStickerPlaced?.();
         return;
       }
@@ -126,38 +210,69 @@ const CollabLayer = forwardRef(function CollabLayer(
 
   const handlePointerMove = useCallback(
     ({ x, y }) => {
-      if (activeTool !== 'pen' || !drawingId) return;
-      setLocalElements((prev) => {
-        const current = prev[drawingId];
-        if (!current) return prev;
-        const points = current.points;
-        const last = points[points.length - 1];
-        const dx = x - last[0];
-        const dy = y - last[1];
-        if (Math.sqrt(dx * dx + dy * dy) < PEN_MIN_POINT_DISTANCE) return prev;
-        if (points.length >= MAX_PEN_POINTS) return prev;
-        return { ...prev, [drawingId]: { ...current, points: [...points, [x, y]] } };
-      });
+      if (activeTool === 'pen' && drawingId) {
+        setLocalElements((prev) => {
+          const current = prev[drawingId];
+          if (!current) return prev;
+          const points = current.points;
+          const last = points[points.length - 1];
+          const dx = x - last[0];
+          const dy = y - last[1];
+          if (Math.sqrt(dx * dx + dy * dy) < PEN_MIN_POINT_DISTANCE) return prev;
+          if (points.length >= MAX_PEN_POINTS) return prev;
+          return { ...prev, [drawingId]: { ...current, points: [...points, [x, y]] } };
+        });
+        return;
+      }
+      if (activeTool === 'frame') {
+        setFrameDraft((prev) => {
+          if (!prev || prev.phase !== 'drawing') return prev;
+          const x0 = Math.min(prev.startX, x);
+          const y0 = Math.min(prev.startY, y);
+          return { ...prev, x: x0, y: y0, width: Math.abs(x - prev.startX), height: Math.abs(y - prev.startY) };
+        });
+        return;
+      }
+      if (activeTool === 'sticker' && pendingSticker) {
+        setStickerGhost({ x, y });
+      }
     },
-    [activeTool, drawingId]
+    [activeTool, drawingId, pendingSticker]
   );
 
   const handlePointerUp = useCallback(() => {
-    if (activeTool !== 'pen' || !drawingId) return;
-    const id = drawingId;
-    setDrawingId(null);
-    setLocalElements((prev) => {
-      const stroke = prev[id];
-      if (!stroke) return prev;
-      if (stroke.points.length < 2) {
-        const next = { ...prev };
-        delete next[id];
-        return next;
-      }
-      const { _inProgress, ...payload } = stroke;
-      commitLocal(id, payload);
-      return { ...prev, [id]: payload };
-    });
+    if (activeTool === 'pen' && drawingId) {
+      const id = drawingId;
+      setDrawingId(null);
+      setLocalElements((prev) => {
+        const stroke = prev[id];
+        if (!stroke) return prev;
+        if (stroke.points.length < 2) {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        }
+        const { _inProgress, ...payload } = stroke;
+        commitLocal(id, payload);
+        return { ...prev, [id]: payload };
+      });
+      return;
+    }
+    if (activeTool === 'frame') {
+      setFrameDraft((prev) => {
+        if (!prev || prev.phase !== 'drawing') return prev;
+        // Enforce a minimum box size (a bare click, with no drag, lands
+        // here too) without moving its anchor corner.
+        return {
+          ...prev,
+          width: Math.max(prev.width, MIN_FRAME_SIZE.width),
+          height: Math.max(prev.height, MIN_FRAME_SIZE.height),
+          phase: 'editing',
+          text: '',
+          color: identityRef.current?.color,
+        };
+      });
+    }
   }, [activeTool, drawingId, commitLocal]);
 
   useImperativeHandle(ref, () => ({ handlePointerDown, handlePointerMove, handlePointerUp }), [
@@ -175,23 +290,38 @@ const CollabLayer = forwardRef(function CollabLayer(
     return () => window.removeEventListener('pointerup', handlePointerUp);
   }, [drawingId, handlePointerUp]);
 
-  function commitDraft() {
-    if (!draft) return;
-    const text = draft.text.trim().slice(0, MAX_TEXT_LENGTH);
-    setDraft(null);
-    if (!text) return;
-    if (draft.tool === 'frame') {
-      placeElement({
-        type: 'frame',
-        x: draft.x,
-        y: draft.y,
-        width: DEFAULT_FRAME_SIZE.width,
-        height: DEFAULT_FRAME_SIZE.height,
-        text,
-      });
-    } else {
-      placeElement({ type: 'text', x: draft.x, y: draft.y, text });
+  function commitTextDraft() {
+    if (!textDraft) return;
+    const text = textDraft.text.trim().slice(0, MAX_TEXT_LENGTH);
+    if (!text) {
+      setTextDraft(null);
+      return;
     }
+    placeElement({
+      type: 'text',
+      x: textDraft.x,
+      y: textDraft.y,
+      text,
+      color: textDraft.color,
+      fontSize: textDraft.size,
+      fontFamily: textDraft.font,
+    });
+    setTextDraft(null);
+  }
+
+  function commitFrameDraft() {
+    if (!frameDraft) return;
+    const text = frameDraft.text.trim().slice(0, MAX_TEXT_LENGTH);
+    placeElement({
+      type: 'frame',
+      x: frameDraft.x,
+      y: frameDraft.y,
+      width: frameDraft.width,
+      height: frameDraft.height,
+      text,
+      color: frameDraft.color,
+    });
+    setFrameDraft(null);
   }
 
   async function handleFlag(id) {
@@ -238,6 +368,63 @@ const CollabLayer = forwardRef(function CollabLayer(
         const canModerate = isLocalOnly || (myUid && (myUid === el.authorUid || myUid === OWNER_UID));
         if (isHidden && !canModerate) return null;
 
+        if (el.type === 'pen') {
+          const xs = el.points.map((p) => p[0]);
+          const ys = el.points.map((p) => p[1]);
+          const minX = Math.min(...xs) - 10;
+          const minY = Math.min(...ys) - 10;
+          const w = Math.max(...xs) - minX + 20;
+          const h = Math.max(...ys) - minY + 20;
+          return (
+            <div key={id} className="group absolute" style={{ left: minX, top: minY, width: w, height: h }}>
+              <svg width={w} height={h} className="overflow-visible pointer-events-none">
+                <path
+                  d={pointsToPath(el.points.map(([x, y]) => [x - minX, y - minY]))}
+                  fill="none"
+                  stroke={el.color || '#FF3D81'}
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity={isHidden ? 0.3 : 1}
+                />
+              </svg>
+              {/* Redesigned per feedback: the old pair of bare circular
+                  icons overlapping the stroke's own corner read as stray
+                  floating dots on a thin line with nothing to anchor to.
+                  One pill, with a real background/shadow, sitting just
+                  outside the stroke's bounding box instead of on top of
+                  it, reads as a control instead. */}
+              <div
+                className="absolute flex items-center gap-1 rounded-full bg-bg border border-border/15 shadow-lg px-1 py-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+                style={{ left: w + 6, top: Math.max(h - 28, 0) }}
+              >
+                {canModerate && (
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(id)}
+                    aria-label="Delete drawing"
+                    title="Delete"
+                    className="w-6 h-6 rounded-full text-xs text-fg/70 hover:bg-surface/10 hover:text-accent flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                )}
+                {!flaggedByMe.has(id) && (
+                  <button
+                    type="button"
+                    onClick={() => handleFlag(id)}
+                    aria-label="Flag drawing as inappropriate"
+                    title="Flag"
+                    className="w-6 h-6 rounded-full text-xs text-fg/70 hover:bg-surface/10 hover:text-accent flex items-center justify-center"
+                  >
+                    ⚑
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        }
+
         const controls = (
           <span className="absolute -top-3 -right-3 flex gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
             {canModerate && (
@@ -262,36 +449,6 @@ const CollabLayer = forwardRef(function CollabLayer(
             )}
           </span>
         );
-
-        if (el.type === 'pen') {
-          const path = pointsToPath(el.points);
-          const xs = el.points.map((p) => p[0]);
-          const ys = el.points.map((p) => p[1]);
-          const minX = Math.min(...xs) - 10;
-          const minY = Math.min(...ys) - 10;
-          const w = Math.max(...xs) - minX + 20;
-          const h = Math.max(...ys) - minY + 20;
-          return (
-            <div
-              key={id}
-              className="group absolute"
-              style={{ left: minX, top: minY, width: w, height: h }}
-            >
-              <svg width={w} height={h} className="overflow-visible pointer-events-none">
-                <path
-                  d={pointsToPath(el.points.map(([x, y]) => [x - minX, y - minY]))}
-                  fill="none"
-                  stroke={el.color || '#FF3D81'}
-                  strokeWidth={3}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  opacity={isHidden ? 0.3 : 1}
-                />
-              </svg>
-              {controls}
-            </div>
-          );
-        }
 
         if (el.type === 'sticker') {
           return (
@@ -322,10 +479,7 @@ const CollabLayer = forwardRef(function CollabLayer(
               }}
             >
               {el.text && (
-                <span
-                  className="absolute -top-6 left-0 text-xs font-medium px-1"
-                  style={{ color: el.color }}
-                >
+                <span className="absolute -top-6 left-0 text-xs font-medium px-1" style={{ color: el.color }}>
                   {el.text}
                 </span>
               )}
@@ -338,7 +492,9 @@ const CollabLayer = forwardRef(function CollabLayer(
         return (
           <div
             key={id}
-            className="group absolute max-w-[220px] text-sm font-medium px-2 py-1 rounded bg-bg/80 border"
+            className={`group absolute max-w-[220px] font-medium px-2 py-1 rounded bg-bg/80 border ${textSizeClass(
+              el.fontSize
+            )} ${textFontClass(el.fontFamily)}`}
             style={{ left: el.x, top: el.y, borderColor: el.color, color: el.color, opacity: isHidden ? 0.3 : 1 }}
           >
             {el.text}
@@ -347,25 +503,127 @@ const CollabLayer = forwardRef(function CollabLayer(
         );
       })}
 
-      {draft && (
+      {/* Frame tool: the box itself while being dragged to size (no label
+          yet — drawn first, named after, per David's explicit ask). */}
+      {frameDraft?.phase === 'drawing' && (
         <div
-          className="absolute z-10"
-          style={{ left: draft.x, top: draft.y, width: draft.tool === 'frame' ? DEFAULT_FRAME_SIZE.width : 220 }}
+          className="absolute rounded-lg border-2 border-dashed pointer-events-none"
+          style={{
+            left: frameDraft.x,
+            top: frameDraft.y,
+            width: frameDraft.width,
+            height: frameDraft.height,
+            borderColor: identityRef.current?.color || '#FF3D81',
+          }}
+        />
+      )}
+
+      {/* Frame tool: now that it's sized, a chance to label and color it
+          before it's actually placed. */}
+      {frameDraft?.phase === 'editing' && (
+        <>
+          <div
+            className="absolute rounded-lg border-2 border-dashed pointer-events-none"
+            style={{
+              left: frameDraft.x,
+              top: frameDraft.y,
+              width: frameDraft.width,
+              height: frameDraft.height,
+              borderColor: frameDraft.color,
+            }}
+          />
+          <div
+            className="absolute z-10 w-64 rounded-lg border border-border/10 bg-bg p-3 shadow-xl space-y-2.5"
+            style={{ left: frameDraft.x, top: frameDraft.y + frameDraft.height + 8 }}
+          >
+            <input
+              autoFocus
+              type="text"
+              value={frameDraft.text}
+              maxLength={MAX_TEXT_LENGTH}
+              placeholder="Label this frame… (optional)"
+              onChange={(e) => setFrameDraft((d) => ({ ...d, text: e.target.value }))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') commitFrameDraft();
+                if (e.key === 'Escape') setFrameDraft(null);
+              }}
+              className="w-full rounded-md border border-border/15 bg-surface/5 px-2 py-1.5 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-accent"
+            />
+            <ColorSwatches value={frameDraft.color} onChange={(color) => setFrameDraft((d) => ({ ...d, color }))} />
+            <div className="flex justify-end gap-2 pt-0.5">
+              <button
+                type="button"
+                onClick={() => setFrameDraft(null)}
+                className="text-xs text-fg/50 hover:text-fg px-2 py-1"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={commitFrameDraft}
+                className="text-xs font-medium rounded-md bg-accent text-accent-ink px-3 py-1.5 hover:scale-[1.03] transition-transform"
+              >
+                Add frame
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Sticker tool: a translucent preview of the selected sticker
+          following the cursor before it's actually placed. */}
+      {activeTool === 'sticker' && pendingSticker && stickerGhost && (
+        <div
+          className="absolute text-3xl select-none pointer-events-none opacity-50"
+          style={{ left: stickerGhost.x - 18, top: stickerGhost.y - 18 }}
+        >
+          {pendingSticker}
+        </div>
+      )}
+
+      {textDraft && (
+        <div
+          className="absolute z-10 w-64 rounded-lg border border-border/10 bg-bg p-3 shadow-xl space-y-2.5"
+          style={{ left: textDraft.x, top: textDraft.y }}
         >
           <input
             autoFocus
             type="text"
-            value={draft.text}
+            value={textDraft.text}
             maxLength={MAX_TEXT_LENGTH}
-            placeholder={draft.tool === 'frame' ? 'Label this frame…' : 'Say something…'}
-            onChange={(e) => setDraft((d) => ({ ...d, text: e.target.value }))}
-            onBlur={commitDraft}
+            placeholder="Say something…"
+            onChange={(e) => setTextDraft((d) => ({ ...d, text: e.target.value }))}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') commitDraft();
-              if (e.key === 'Escape') setDraft(null);
+              if (e.key === 'Enter') commitTextDraft();
+              if (e.key === 'Escape') setTextDraft(null);
             }}
-            className="w-full rounded-md border border-accent bg-bg px-2 py-1.5 text-sm text-fg shadow-lg focus:outline-none"
+            className="w-full rounded-md border border-border/15 bg-surface/5 px-2 py-1.5 text-sm text-fg focus:outline-none focus:ring-2 focus:ring-accent"
           />
+          <ColorSwatches value={textDraft.color} onChange={(color) => setTextDraft((d) => ({ ...d, color }))} />
+          <SegmentedPicker
+            options={TEXT_SIZES}
+            value={textDraft.size}
+            onChange={(size) => setTextDraft((d) => ({ ...d, size }))}
+            labelPrefix="Size"
+          />
+          <SegmentedPicker
+            options={TEXT_FONTS}
+            value={textDraft.font}
+            onChange={(font) => setTextDraft((d) => ({ ...d, font }))}
+            labelPrefix="Font"
+          />
+          <div className="flex justify-end gap-2 pt-0.5">
+            <button type="button" onClick={() => setTextDraft(null)} className="text-xs text-fg/50 hover:text-fg px-2 py-1">
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={commitTextDraft}
+              className="text-xs font-medium rounded-md bg-accent text-accent-ink px-3 py-1.5 hover:scale-[1.03] transition-transform"
+            >
+              Add text
+            </button>
+          </div>
         </div>
       )}
     </>

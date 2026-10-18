@@ -262,7 +262,7 @@ export default function HomePage() {
         </div>
       </CanvasStage>
 
-      <SignatureCursor />
+      <SignatureCursor paused={activeTool !== 'move'} />
 
       <CanvasNav regions={REGIONS} active={activeRegion} onNavigate={panTo} />
       {/* Hidden until presence is actually live (same `isLive` signal
@@ -284,6 +284,7 @@ export default function HomePage() {
         onToggleComments={() => setCommentsOpen((v) => !v)}
         stickerPickerOpen={activeTool === 'sticker'}
         onSelectSticker={setPendingSticker}
+        pendingSticker={pendingSticker}
       />
 
       <CommentsPanel

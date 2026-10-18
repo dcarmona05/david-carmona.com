@@ -27,6 +27,7 @@ export default function CollabToolbar({
   onToggleComments,
   stickerPickerOpen,
   onSelectSticker,
+  pendingSticker,
 }) {
   return (
     // Docked higher up on narrow screens so it never shares horizontal
@@ -40,14 +41,17 @@ export default function CollabToolbar({
       )}
 
       {stickerPickerOpen && (
-        <div className="flex items-center gap-1 rounded-full border border-border/10 bg-bg/90 backdrop-blur-md px-2 py-1.5 shadow-lg">
+        <div className="grid grid-cols-5 gap-0.5 max-w-[260px] rounded-2xl border border-border/10 bg-bg/90 backdrop-blur-md p-1.5 shadow-lg">
           {STICKERS.map((sticker) => (
             <button
               key={sticker}
               type="button"
               onClick={() => onSelectSticker(sticker)}
+              aria-pressed={pendingSticker === sticker}
               aria-label={`Place ${sticker} sticker`}
-              className="w-8 h-8 flex items-center justify-center text-lg rounded-full hover:bg-surface/10 transition-colors"
+              className={`w-9 h-9 flex items-center justify-center text-lg rounded-full transition-colors ${
+                pendingSticker === sticker ? 'bg-accent/15' : 'hover:bg-surface/10'
+              }`}
             >
               {sticker}
             </button>

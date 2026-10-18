@@ -16,8 +16,13 @@ const IDLE_FADE_MS = 1400;
  *
  * Position is driven entirely via a ref + direct style writes, not React
  * state, so a fast mouse doesn't trigger a re-render on every pixel.
+ *
+ * `paused` (true while any create-tool is active) hides it — it would
+ * otherwise sit right on top of whatever per-element controls/popover
+ * appear right at the pointer while actually using a tool, which is
+ * exactly where this signature also likes to hover.
  */
-export default function SignatureCursor() {
+export default function SignatureCursor({ paused = false }) {
   const dotRef = useRef(null);
   const [visible, setVisible] = useState(false);
   const [enabled, setEnabled] = useState(false);
@@ -57,7 +62,7 @@ export default function SignatureCursor() {
       ref={dotRef}
       aria-hidden="true"
       className={`fixed top-0 left-0 z-50 pointer-events-none transition-opacity duration-300 ${
-        visible ? 'opacity-100' : 'opacity-0'
+        visible && !paused ? 'opacity-100' : 'opacity-0'
       }`}
       style={{ transform: 'translate3d(-9999px, -9999px, 0)' }}
     >

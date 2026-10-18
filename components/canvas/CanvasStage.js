@@ -225,7 +225,7 @@ const CanvasStage = forwardRef(function CanvasStage(
       }}
       onPointerUp={handlePointerEvent(onCanvasPointerUp)}
       className={`canvas-dot-grid relative w-full overflow-hidden ${className} ${
-        panningDisabled ? 'cursor-crosshair' : ''
+        panningDisabled ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing'
       }`}
     >
       <TransformWrapper
