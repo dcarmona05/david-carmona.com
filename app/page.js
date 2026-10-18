@@ -21,75 +21,79 @@ import { work } from '@/lib/work';
 import { getIdentity } from '@/lib/identity';
 import { startPresence, subscribeVisitCount, countVisitOnce } from '@/lib/presence';
 
-// World-space layout of the canvas regions — stacked top-to-bottom (not
-// side-by-side) per David's preference for a vertical flow over side
-// scrolling, in the same order as the DOM/Tab order below (Home, About,
-// Work, Contact). Every region shares one uniform width (not a different
-// one per region) and a tighter, consistent gap, rather than the looser,
-// varied sizing from the first pass — Frame's height is still auto (sized
-// to its real content), so these y positions are estimates, not pixel-exact.
+// World-space layout of the canvas regions — stacked top-to-bottom per
+// David's preference for a vertical flow over side scrolling, in the same
+// order as the DOM/Tab order below (Home, Work, Contact — Home now absorbs
+// the former About region, see RegionContent below).
+//
+// Previous versions of this file hand-estimated each region's absolute y
+// position, which caused two separate real bugs logged in
+// CANVAS_REBUILD.md: Work's grid rendering taller than guessed (Contact
+// overlapped it), and then overcorrecting that gap so far it read as "huge
+// gaps" once content changed again. Both were symptoms of the same root
+// cause — guessing a number instead of measuring it. Fixed at the root:
+// regions now render in normal vertical flow (a flex column with one fixed
+// REGION_GAP, not absolute x/y), so each region's real position is always
+// exactly its real rendered height — never re-estimated, never wrong, and
+// `limitToBounds` (CanvasStage) measures the real content size directly
+// rather than needing a separate height value passed in.
 const REGION_WIDTH = 700;
 const WORLD_WIDTH = REGION_WIDTH + 200;
-const REGION_X = (WORLD_WIDTH - REGION_WIDTH) / 2;
+const REGION_GAP = 112;
 const REGIONS = [
-  { id: 'home', label: 'Home', x: REGION_X, y: 60, width: REGION_WIDTH },
-  { id: 'about', label: 'About', x: REGION_X, y: 580, width: REGION_WIDTH },
-  { id: 'work', label: 'Work', x: REGION_X, y: 1060, width: REGION_WIDTH },
-  // Real bug: at REGION_WIDTH=700, Work's 2-col/4-row grid of 7 cards
-  // renders far taller (~2420px) than the original estimate (~1700px) —
-  // confirmed via a screenshot showing Contact's frame overlapping right
-  // into the bottom of Work's last card. Pushed down to actually clear it.
-  { id: 'contact', label: 'Contact', x: REGION_X, y: 3600, width: REGION_WIDTH },
+  { id: 'home', label: 'Home', width: REGION_WIDTH },
+  { id: 'work', label: 'Work', width: REGION_WIDTH },
+  { id: 'contact', label: 'Contact', width: REGION_WIDTH },
 ];
-
-// Contact's estimated bottom (~3600 + ~650) plus a small margin — tight on
-// purpose (see the 2026-10-18 entry in CANVAS_REBUILD.md on why too
-// generous a margin here is its own bug now that panning is bounded).
-const WORLD_HEIGHT = 4350;
 
 // Rendered once per region id, used by both the canvas Frame layout and the
 // stacked skip-link fallback — same component, not a second copy to
 // maintain (per CANVAS_REBUILD.md's accessibility plan).
 function RegionContent({ id }) {
   if (id === 'home') {
+    // Home now absorbs the former standalone About region — they repeated
+    // similar "complex, enterprise-scale software" framing as two separate
+    // stops on the same canvas, which read as redundant. One region, one
+    // scan path: photo leads (David's explicit preference, over leading
+    // with the name/role text block), then identity, then one consolidated
+    // intro (merging the old hero line + first bio paragraph without
+    // repeating the same idea twice), then the ways forward. `siteConfig`'s
+    // `heroDescription`/`bio` are untouched — the real /about page still
+    // reads from them directly, unforked.
     return (
       <div className="relative">
         <div className="hidden sm:block absolute -right-4 -top-10 w-40 h-40 opacity-80">
           <HeroDoodle />
         </div>
-        <h1 className="font-display font-bold text-3xl sm:text-4xl leading-[1.1] tracking-tight text-fg">
-          {siteConfig.name}
-        </h1>
-        <p className="mt-2 text-lg text-fg/60">{siteConfig.role}</p>
-        <p className="mt-6 max-w-md text-fg/70 leading-relaxed text-balance">
-          {siteConfig.heroDescription}
-        </p>
-        <Link
-          href="/contact"
-          className="mt-8 inline-block bg-accent text-accent-ink font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform"
-        >
-          Get in touch
-        </Link>
-      </div>
-    );
-  }
-
-  if (id === 'about') {
-    return (
-      <div>
-        <div className="flex items-start gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6">
           <PhotoFrame src="/profile.jpg" alt={siteConfig.name} />
           <div>
-            <h2 className="font-display font-bold text-2xl text-fg">About</h2>
-            <p className="mt-3 text-fg/70 leading-relaxed">{siteConfig.bio[0]}</p>
+            <h1 className="font-display font-bold text-3xl sm:text-4xl leading-[1.1] tracking-tight text-fg">
+              {siteConfig.name}
+            </h1>
+            <p className="mt-2 text-lg text-fg/60">{siteConfig.role}</p>
           </div>
         </div>
-        <Link
-          href="/about"
-          className="mt-6 inline-flex items-center text-fg/70 hover:text-accent transition-colors"
-        >
-          Full bio &amp; experience &rarr;
-        </Link>
+        <p className="mt-6 max-w-md text-fg/70 leading-relaxed text-balance">
+          I design systems and products for complex, enterprise-scale
+          software — first at LinkedIn for over a decade, now leading design
+          systems and AI-assisted workflows at ServiceNow. I care about the
+          details that make software feel considered, not just functional.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Link
+            href="/contact"
+            className="inline-block bg-accent text-accent-ink font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform"
+          >
+            Get in touch
+          </Link>
+          <Link
+            href="/about"
+            className="inline-flex items-center text-fg/70 hover:text-accent transition-colors"
+          >
+            Full bio &amp; experience &rarr;
+          </Link>
+        </div>
       </div>
     );
   }
@@ -236,18 +240,13 @@ export default function HomePage() {
         onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
         onCanvasPointerUp={(world, e) => collabRef.current?.handlePointerUp(world, e)}
         onPointerPositionChange={(world) => presenceApiRef.current.updateCursor(world.x, world.y)}
-        worldHeight={WORLD_HEIGHT}
       >
-        <div className="relative" style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT }}>
+        <div
+          className="relative flex flex-col items-center"
+          style={{ width: WORLD_WIDTH, gap: REGION_GAP, paddingTop: 60, paddingBottom: 60 }}
+        >
           {REGIONS.map((region) => (
-            <Frame
-              key={region.id}
-              id={region.id}
-              title={region.label}
-              x={region.x}
-              y={region.y}
-              width={region.width}
-            >
+            <Frame key={region.id} id={region.id} title={region.label} width={region.width}>
               <RegionContent id={region.id} />
             </Frame>
           ))}

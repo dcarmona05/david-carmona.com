@@ -18,7 +18,6 @@ const OWNER_UID = process.env.NEXT_PUBLIC_CANVAS_OWNER_UID || null;
 
 const REGIONS = [
   { id: 'home', label: 'Home' },
-  { id: 'about', label: 'About' },
   { id: 'work', label: 'Work' },
   { id: 'contact', label: 'Contact' },
 ];
