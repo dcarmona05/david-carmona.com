@@ -85,7 +85,7 @@ export default function OttoCaseStudyPage() {
           &larr; All work
         </Link>
 
-        <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
+        <div className="relative mt-6 aspect-video rounded-lg overflow-hidden bg-black">
           <HeroVideo src={item.videoUrl} poster={item.heroImage} />
         </div>
         <p className="mt-2 text-xs text-fg/35">
