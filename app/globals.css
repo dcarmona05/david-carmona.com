@@ -4,11 +4,13 @@
 
 /*
  * Theme tokens. Dark values are the site's original, unchanged colors (zero
- * regression). Light values use a warm off-white bg and darkened accents for
- * AA text contrast. The "-bright" accents stay the original punchy hexes in
- * both themes, for decorative-only uses (HeroDoodle, TopoBackground, etc.)
- * that don't need text contrast. "-ink" is the text/icon color to place on
- * top of an accent-colored surface (e.g. a button).
+ * regression). Light values use a neutral light-gray bg (same #F5F5F5 as the
+ * boot splash, echoing Figma's own loading-screen background) and darkened
+ * accents for AA text contrast. The "-bright" accents stay the original
+ * punchy hexes in both themes, for decorative-only uses (HeroDoodle,
+ * TopoBackground, etc.) that don't need text contrast. "-ink" is the
+ * text/icon color to place on top of an accent-colored surface (e.g. a
+ * button).
  */
 @layer base {
   :root[data-theme='dark'] {
@@ -26,7 +28,7 @@
   }
 
   :root[data-theme='light'] {
-    --color-bg: 250 249 246;
+    --color-bg: 245 245 245;
     --color-fg: 20 20 20;
     --color-surface: 20 20 20;
     --color-border: 20 20 20;
