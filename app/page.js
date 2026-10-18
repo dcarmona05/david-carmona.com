@@ -1,12 +1,15 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import CanvasStage from '@/components/canvas/CanvasStage';
 import CanvasNav from '@/components/canvas/CanvasNav';
 import CollabToolbar from '@/components/canvas/CollabToolbar';
 import CollabLayer from '@/components/canvas/CollabLayer';
 import CommentsPanel from '@/components/canvas/CommentsPanel';
+import PresenceCursors from '@/components/canvas/PresenceCursors';
+import VisitorAvatars from '@/components/canvas/VisitorAvatars';
+import VisitCounter from '@/components/canvas/VisitCounter';
 import Frame from '@/components/canvas/Frame';
 import CaseStudyCard from '@/components/CaseStudyCard';
 import ContactForm from '@/components/ContactForm';
@@ -15,6 +18,8 @@ import PhotoFrame from '@/components/PhotoFrame';
 import PageShell from '@/components/PageShell';
 import { siteConfig } from '@/lib/site';
 import { work } from '@/lib/work';
+import { getIdentity } from '@/lib/identity';
+import { startPresence, subscribeVisitCount, countVisitOnce } from '@/lib/presence';
 
 // World-space layout of the canvas regions. Positions are deliberately
 // loose/whiteboard-style, not a rigid grid — but left-to-right in the same
@@ -126,6 +131,47 @@ export default function HomePage() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
 
+  // Phase 4 — live presence. `myIdentity` starts null (matches the server
+  // render) and is only set inside the effect below — computing it directly
+  // during render would make the client's first render disagree with the
+  // server's and trigger a hydration mismatch (sessionStorage/Math.random
+  // don't exist/match server-side).
+  const presenceApiRef = useRef({ updateCursor: () => {} });
+  const [others, setOthers] = useState({});
+  const [visitCount, setVisitCount] = useState(0);
+  const [myIdentity, setMyIdentity] = useState(null);
+
+  useEffect(() => {
+    let stopped = false;
+    let api = { updateCursor: () => {}, stop: () => {} };
+    const identity = getIdentity();
+    setMyIdentity(identity);
+
+    startPresence({
+      nickname: identity.nickname,
+      color: identity.color,
+      onOthersChange: (next) => {
+        if (!stopped) setOthers(next);
+      },
+    }).then((result) => {
+      if (stopped) {
+        result.stop();
+        return;
+      }
+      api = result;
+      presenceApiRef.current = api;
+    });
+
+    countVisitOnce();
+    const unsubCount = subscribeVisitCount(setVisitCount);
+
+    return () => {
+      stopped = true;
+      api.stop();
+      unsubCount();
+    };
+  }, []);
+
   const panTo = useCallback((id) => {
     setActiveRegion(id);
     stageRef.current?.panToRegion(id);
@@ -178,6 +224,7 @@ export default function HomePage() {
         onCanvasPointerDown={(world, e) => collabRef.current?.handlePointerDown(world, e)}
         onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
         onCanvasPointerUp={(world, e) => collabRef.current?.handlePointerUp(world, e)}
+        onPointerPositionChange={(world) => presenceApiRef.current.updateCursor(world.x, world.y)}
       >
         <div className="relative" style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT }}>
           {REGIONS.map((region) => (
@@ -199,10 +246,13 @@ export default function HomePage() {
             onStickerPlaced={() => setPendingSticker(null)}
             onLiveStatusChange={setIsLive}
           />
+          <PresenceCursors others={others} />
         </div>
       </CanvasStage>
 
       <CanvasNav regions={REGIONS} active={activeRegion} onNavigate={panTo} />
+      <VisitorAvatars others={others} mine={myIdentity} />
+      <VisitCounter count={visitCount} />
 
       <CollabToolbar
         activeTool={activeTool}

@@ -26,6 +26,7 @@ const CanvasStage = forwardRef(function CanvasStage(
     onCanvasPointerDown,
     onCanvasPointerMove,
     onCanvasPointerUp,
+    onPointerPositionChange,
   },
   ref
 ) {
@@ -154,11 +155,26 @@ const CanvasStage = forwardRef(function CanvasStage(
     [panningDisabled, screenToWorld]
   );
 
+  // Phase 4 — reports hover position in world coordinates regardless of the
+  // active tool (unlike the gated create-tool handlers above), so presence
+  // can broadcast this visitor's cursor even while just panning around.
+  const handleHover = useCallback(
+    (event) => {
+      if (!onPointerPositionChange) return;
+      const world = screenToWorld(event.clientX, event.clientY);
+      if (world) onPointerPositionChange(world);
+    },
+    [onPointerPositionChange, screenToWorld]
+  );
+
   return (
     <div
       ref={wrapperRef}
       onPointerDown={handlePointerEvent(onCanvasPointerDown)}
-      onPointerMove={handlePointerEvent(onCanvasPointerMove)}
+      onPointerMove={(event) => {
+        handlePointerEvent(onCanvasPointerMove)(event);
+        handleHover(event);
+      }}
       onPointerUp={handlePointerEvent(onCanvasPointerUp)}
       className={`canvas-dot-grid relative w-full overflow-hidden ${className} ${
         panningDisabled ? 'cursor-crosshair' : ''
