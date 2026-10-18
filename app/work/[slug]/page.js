@@ -37,14 +37,20 @@ export default function CaseStudyPage({ params }) {
           &larr; All work
         </Link>
 
-        <div className={`relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-gradient-to-br ${item.accent}`}>
+        <div
+          className={
+            item.heroImage
+              ? 'relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black'
+              : `relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-gradient-to-br ${item.accent}`
+          }
+        >
           {item.heroImage ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={item.heroImage}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover object-top opacity-80"
+              className="absolute inset-0 w-full h-full object-cover object-top"
             />
           ) : (
             <svg className="absolute inset-0 w-full h-full opacity-30" aria-hidden="true">

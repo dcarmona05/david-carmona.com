@@ -46,13 +46,13 @@ export default function OttoCaseStudyPage() {
           &larr; All work
         </Link>
 
-        <div className={`relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-gradient-to-br ${item.accent}`}>
+        <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={item.heroImage}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover object-top opacity-80"
+            className="absolute inset-0 w-full h-full object-cover object-top"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
 
