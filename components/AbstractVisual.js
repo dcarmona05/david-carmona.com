@@ -7,7 +7,7 @@ function DesignSystemsVisual() {
       {swatches.map((_, i) => (
         <div
           key={i}
-          className="rounded-md border border-white/10"
+          className="rounded-md border border-border/10"
           style={{
             backgroundColor: `${PALETTE[i % 3]}${i % 5 === 0 ? '30' : '12'}`,
             aspectRatio: '1 / 1',
@@ -22,10 +22,10 @@ function ProductDesignVisual() {
   return (
     <div className="flex flex-col gap-3 w-full h-full p-6 justify-center">
       {[0.9, 0.6, 0.75].map((w, i) => (
-        <div key={i} className="rounded-md border border-white/10 bg-white/5 p-3" style={{ width: `${w * 100}%` }}>
+        <div key={i} className="rounded-md border border-border/10 bg-surface/5 p-3" style={{ width: `${w * 100}%` }}>
           <div className="h-2 rounded-full" style={{ width: '40%', backgroundColor: `${PALETTE[i % 3]}80` }} />
-          <div className="mt-2 h-1.5 rounded-full bg-white/10 w-full" />
-          <div className="mt-1.5 h-1.5 rounded-full bg-white/10 w-2/3" />
+          <div className="mt-2 h-1.5 rounded-full bg-surface/10 w-full" />
+          <div className="mt-1.5 h-1.5 rounded-full bg-surface/10 w-2/3" />
         </div>
       ))}
     </div>
@@ -77,7 +77,7 @@ function DesignOpsVisual() {
             className="w-8 h-8 rounded-full border-2 shrink-0"
             style={{ borderColor: PALETTE[i % 3] }}
           />
-          {i < steps - 1 && <div className="flex-1 h-px bg-white/15 mx-1" />}
+          {i < steps - 1 && <div className="flex-1 h-px bg-border/15 mx-1" />}
         </div>
       ))}
     </div>
@@ -95,7 +95,7 @@ const VISUALS_BY_CATEGORY = {
 export default function AbstractVisual({ category }) {
   const Visual = VISUALS_BY_CATEGORY[category] || DesignSystemsVisual;
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.02] overflow-hidden aspect-[16/10]">
+    <div className="rounded-lg border border-border/10 bg-surface/[0.02] overflow-hidden aspect-[16/10]">
       <Visual />
     </div>
   );

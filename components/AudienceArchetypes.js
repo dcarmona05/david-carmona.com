@@ -35,15 +35,15 @@ export default function AudienceArchetypes({ category }) {
   return (
     <div className="grid sm:grid-cols-3 gap-6">
       {archetypes.map((person, i) => (
-        <div key={person.role} className="rounded-lg border border-white/10 p-5">
+        <div key={person.role} className="rounded-lg border border-border/10 p-5">
           <span
             className="inline-flex w-8 h-8 rounded-full items-center justify-center text-xs font-display font-medium text-black"
             style={{ backgroundColor: PALETTE[i % 3] }}
           >
             {person.role.charAt(0)}
           </span>
-          <h4 className="mt-3 font-display font-medium text-white">{person.role}</h4>
-          <p className="mt-1.5 text-sm text-white/60 leading-relaxed">{person.need}</p>
+          <h4 className="mt-3 font-display font-medium text-fg">{person.role}</h4>
+          <p className="mt-1.5 text-sm text-fg/60 leading-relaxed">{person.need}</p>
         </div>
       ))}
     </div>

@@ -34,7 +34,7 @@ export default function CaseStudyPage({ params }) {
   return (
     <div>
       <Reveal>
-        <Link href="/work" className="text-sm text-white/60 hover:text-accent transition-colors">
+        <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
           &larr; All work
         </Link>
 
@@ -84,14 +84,14 @@ export default function CaseStudyPage({ params }) {
           </div>
         </div>
 
-        <p className="mt-8 max-w-2xl text-lg text-white/70 leading-relaxed">
+        <p className="mt-8 max-w-2xl text-lg text-fg/70 leading-relaxed">
           {item.description}
         </p>
       </Reveal>
 
       <Reveal delay={0.04}>
-        <section className="mt-20 pt-10 border-t border-white/10">
-          <h2 className="font-display text-2xl font-bold text-white">My Role &amp; Responsibilities</h2>
+        <section className="mt-20 pt-10 border-t border-border/10">
+          <h2 className="font-display text-2xl font-bold text-fg">My Role &amp; Responsibilities</h2>
           <div className="mt-6 max-w-2xl">
             <RoleResponsibilities role={item.role} responsibilities={item.responsibilities} />
           </div>
@@ -99,8 +99,8 @@ export default function CaseStudyPage({ params }) {
       </Reveal>
 
       <Reveal delay={0.05}>
-        <section className="mt-20 pt-10 border-t border-white/10">
-          <h2 className="font-display text-2xl font-bold text-white">Watch It In Action</h2>
+        <section className="mt-20 pt-10 border-t border-border/10">
+          <h2 className="font-display text-2xl font-bold text-fg">Watch It In Action</h2>
           <div className="mt-6 max-w-3xl">
             {item.videos ? <VideoGallery videos={item.videos} /> : <VideoDemo videoUrl={item.videoUrl} />}
           </div>
@@ -109,10 +109,10 @@ export default function CaseStudyPage({ params }) {
 
       {item.overview && (
         <Reveal delay={0.07}>
-          <section className="mt-20 pt-10 border-t border-white/10 grid lg:grid-cols-2 gap-8 items-start">
+          <section className="mt-20 pt-10 border-t border-border/10 grid lg:grid-cols-2 gap-8 items-start">
             <div>
-              <h2 className="font-display text-2xl font-bold text-white">Overview</h2>
-              <p className="mt-3 text-white/70 leading-relaxed">{item.overview}</p>
+              <h2 className="font-display text-2xl font-bold text-fg">Overview</h2>
+              <p className="mt-3 text-fg/70 leading-relaxed">{item.overview}</p>
             </div>
             <AbstractVisual category={item.category} />
           </section>
@@ -121,9 +121,9 @@ export default function CaseStudyPage({ params }) {
 
       {item.screenshots && (
         <Reveal delay={0.075}>
-          <section className="mt-20 pt-10 border-t border-white/10">
-            <h2 className="font-display text-2xl font-bold text-white">Product Walkthrough</h2>
-            <p className="mt-2 text-sm text-white/40 max-w-2xl">
+          <section className="mt-20 pt-10 border-t border-border/10">
+            <h2 className="font-display text-2xl font-bold text-fg">Product Walkthrough</h2>
+            <p className="mt-2 text-sm text-fg/40 max-w-2xl">
               Real screens from the working prototype.
             </p>
             <div className="mt-6">
@@ -134,9 +134,9 @@ export default function CaseStudyPage({ params }) {
       )}
 
       <Reveal delay={0.08}>
-        <section className="mt-20 pt-10 border-t border-white/10">
-          <h2 className="font-display text-2xl font-bold text-white">Who This Serves</h2>
-          <p className="mt-2 text-sm text-white/40 max-w-2xl">
+        <section className="mt-20 pt-10 border-t border-border/10">
+          <h2 className="font-display text-2xl font-bold text-fg">Who This Serves</h2>
+          <p className="mt-2 text-sm text-fg/40 max-w-2xl">
             Typical archetypes for this category of work — illustrative, not the literal validated research for this specific project.
           </p>
           <div className="mt-6">
@@ -146,9 +146,9 @@ export default function CaseStudyPage({ params }) {
       </Reveal>
 
       <Reveal delay={0.09}>
-        <section className="mt-20 rounded-lg border border-white/10 p-6 sm:p-8">
-          <h2 className="font-display text-2xl font-bold text-white">Focus Areas</h2>
-          <p className="mt-2 text-sm text-white/40 max-w-2xl">
+        <section className="mt-20 rounded-lg border border-border/10 p-6 sm:p-8">
+          <h2 className="font-display text-2xl font-bold text-fg">Focus Areas</h2>
+          <p className="mt-2 text-sm text-fg/40 max-w-2xl">
             General considerations for this category of work — not a checklist of what this specific project did or didn’t include.
           </p>
           <div className="mt-6">
@@ -158,9 +158,9 @@ export default function CaseStudyPage({ params }) {
       </Reveal>
 
       <Reveal delay={0.1}>
-        <section className="mt-20 pt-10 border-t border-white/10">
-          <h2 className="font-display text-2xl font-bold text-white">Approach</h2>
-          <p className="mt-2 text-sm text-white/40 max-w-2xl">
+        <section className="mt-20 pt-10 border-t border-border/10">
+          <h2 className="font-display text-2xl font-bold text-fg">Approach</h2>
+          <p className="mt-2 text-sm text-fg/40 max-w-2xl">
             The general process behind this kind of work — specifics vary by project.
           </p>
           <div className="mt-6">
@@ -171,10 +171,10 @@ export default function CaseStudyPage({ params }) {
 
       {item.outcome && (
         <Reveal delay={0.15}>
-          <section className="mt-20 pt-10 border-t border-white/10">
-            <h2 className="font-display text-2xl font-bold text-white">Outputs &amp; Impact</h2>
+          <section className="mt-20 pt-10 border-t border-border/10">
+            <h2 className="font-display text-2xl font-bold text-fg">Outputs &amp; Impact</h2>
             <blockquote className="mt-4 max-w-2xl border-l-2 border-accent pl-6">
-              <p className="font-display text-xl sm:text-2xl text-white leading-snug">
+              <p className="font-display text-xl sm:text-2xl text-fg leading-snug">
                 {item.outcome}
               </p>
             </blockquote>
@@ -183,11 +183,11 @@ export default function CaseStudyPage({ params }) {
       )}
 
       <Reveal delay={0.2}>
-        <div className="mt-20 pt-8 border-t border-white/10 flex items-baseline justify-between">
-          <span className="text-sm text-white/40">Next project</span>
+        <div className="mt-20 pt-8 border-t border-border/10 flex items-baseline justify-between">
+          <span className="text-sm text-fg/40">Next project</span>
           <Link
             href={`/work/${next.slug}`}
-            className="font-display text-white hover:text-accent transition-colors"
+            className="font-display text-fg hover:text-accent transition-colors"
           >
             {next.title} &rarr;
           </Link>

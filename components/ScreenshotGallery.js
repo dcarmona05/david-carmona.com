@@ -27,7 +27,7 @@ export default function ScreenshotGallery({ screenshots }) {
         {screenshots.map((shot, i) => (
           <figure
             key={i}
-            className="rounded-lg border border-white/10 overflow-hidden bg-white/[0.02] hover:border-white/25 transition-colors"
+            className="rounded-lg border border-border/10 overflow-hidden bg-surface/[0.02] hover:border-border/25 transition-colors"
           >
             <button
               type="button"
@@ -38,7 +38,7 @@ export default function ScreenshotGallery({ screenshots }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={shot.src} alt={shot.alt} className="w-full h-auto cursor-zoom-in" loading="lazy" />
             </button>
-            <figcaption className="px-4 py-3 text-sm text-white/50 border-t border-white/10">
+            <figcaption className="px-4 py-3 text-sm text-fg/50 border-t border-border/10">
               {shot.caption || shot.alt}
             </figcaption>
           </figure>

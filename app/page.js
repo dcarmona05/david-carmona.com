@@ -16,11 +16,11 @@ export default function HomePage() {
             <HeroDoodle />
           </div>
 
-          <h1 className="font-display font-bold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-white">
+          <h1 className="font-display font-bold text-4xl sm:text-5xl leading-[1.1] tracking-tight text-fg">
             {siteConfig.name}
           </h1>
-          <p className="mt-2 text-lg text-white/60">{siteConfig.role}</p>
-          <p className="mt-6 max-w-xl text-white/70 leading-relaxed">
+          <p className="mt-2 text-lg text-fg/60">{siteConfig.role}</p>
+          <p className="mt-6 max-w-xl text-fg/70 leading-relaxed">
             I design systems and products for complex, enterprise-scale
             software — turning fragmented experiences into something coherent,
             usable, and fast to build on. I care about the details that make
@@ -28,7 +28,7 @@ export default function HomePage() {
           </p>
           <Link
             href="/contact"
-            className="mt-8 inline-block bg-accent text-black font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform"
+            className="mt-8 inline-block bg-accent text-accent-ink font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform"
           >
             Get in touch
           </Link>
@@ -38,8 +38,8 @@ export default function HomePage() {
       <section className="mt-20">
         <Reveal>
           <div className="flex items-baseline justify-between">
-            <h2 className="font-display text-2xl text-white">Featured Work</h2>
-            <Link href="/work" className="text-sm text-white/60 hover:text-accent transition-colors">
+            <h2 className="font-display text-2xl text-fg">Featured Work</h2>
+            <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
               View all &rarr;
             </Link>
           </div>

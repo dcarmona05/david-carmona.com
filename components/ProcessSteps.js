@@ -28,7 +28,7 @@ const PHASES = [
 export default function ProcessSteps() {
   return (
     <div>
-      <p className="text-sm text-white/40 max-w-2xl">
+      <p className="text-sm text-fg/40 max-w-2xl">
         AI is used as a tool throughout — accelerating research synthesis, prototyping, and documentation, never replacing judgment on what to build.
       </p>
       <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -36,14 +36,14 @@ export default function ProcessSteps() {
           <div key={phase.label} className="relative">
             <div className="flex items-center gap-3">
               <span
-                className="flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-display font-medium text-white shrink-0"
+                className="flex items-center justify-center w-8 h-8 rounded-full border-2 text-sm font-display font-medium text-fg shrink-0"
                 style={{ borderColor: phase.color }}
               >
                 {i + 1}
               </span>
-              <h3 className="font-display font-medium text-white">{phase.label}</h3>
+              <h3 className="font-display font-medium text-fg">{phase.label}</h3>
             </div>
-            <p className="mt-3 text-sm text-white/60 leading-relaxed">{phase.description}</p>
+            <p className="mt-3 text-sm text-fg/60 leading-relaxed">{phase.description}</p>
             <p className="mt-2 text-xs text-accent3/80 leading-relaxed">{phase.aiNote}</p>
           </div>
         ))}

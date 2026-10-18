@@ -64,7 +64,7 @@ export default function CalEmbed() {
   return (
     <div
       ref={containerRef}
-      className="w-full min-h-[600px] rounded-lg border border-white/10 overflow-hidden"
+      className="w-full min-h-[600px] rounded-lg border border-border/10 overflow-hidden"
     />
   );
 }

@@ -54,7 +54,7 @@ export default function FocusAreas({ category }) {
 
   return (
     <div>
-      <h3 className="font-display font-medium text-white">{focus.title}</h3>
+      <h3 className="font-display font-medium text-fg">{focus.title}</h3>
       <ul className="mt-4 space-y-3">
         {focus.items.map((item, i) => (
           <li key={item} className="flex items-start gap-3">
@@ -62,7 +62,7 @@ export default function FocusAreas({ category }) {
               className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
               style={{ backgroundColor: PALETTE[i % 3] }}
             />
-            <span className="text-white/70 leading-relaxed">{item}</span>
+            <span className="text-fg/70 leading-relaxed">{item}</span>
           </li>
         ))}
       </ul>

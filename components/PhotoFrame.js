@@ -4,7 +4,7 @@ export default function PhotoFrame({ src, alt }) {
       <svg
         viewBox="0 0 200 200"
         aria-hidden="true"
-        className="absolute -bottom-4 -right-4 w-full h-full text-accent2/70"
+        className="absolute -bottom-4 -right-4 w-full h-full text-accent2-bright/70"
       >
         <path
           fill="currentColor"

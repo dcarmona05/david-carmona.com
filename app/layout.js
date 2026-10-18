@@ -4,7 +4,22 @@ import { MotionConfig } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AgentChat from '@/components/AgentChat';
+import ThemeProvider from '@/components/ThemeProvider';
 import { siteConfig } from '@/lib/site';
+
+// Runs before React hydrates, so the correct theme is set pre-paint (no flash).
+// Defaults to 'light' on purpose, ignoring OS prefers-color-scheme (per spec).
+const THEME_INIT_SCRIPT = `
+(function () {
+  try {
+    var stored = localStorage.getItem('theme');
+    var theme = stored === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+`;
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -35,16 +50,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
-      <body className="min-h-screen flex flex-col antialiased bg-[#0A0A0A] text-white">
-        <MotionConfig reducedMotion="user">
-          <Header />
-          <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-16">
-            {children}
-          </main>
-          <Footer />
-          <AgentChat />
-        </MotionConfig>
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-screen flex flex-col antialiased bg-bg text-fg">
+        <ThemeProvider>
+          <MotionConfig reducedMotion="user">
+            <Header />
+            <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-16">
+              {children}
+            </main>
+            <Footer />
+            <AgentChat />
+          </MotionConfig>
+        </ThemeProvider>
       </body>
     </html>
   );

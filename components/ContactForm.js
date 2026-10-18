@@ -36,8 +36,8 @@ export default function ContactForm() {
 
   if (status === 'sent') {
     return (
-      <div className="rounded-lg border border-white/10 p-6">
-        <p className="text-white/80">
+      <div className="rounded-lg border border-border/10 p-6">
+        <p className="text-fg/80">
           Thanks for reaching out — I'll get back to you soon.
         </p>
         <button
@@ -54,7 +54,7 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label htmlFor="name" className="block text-sm text-white/60 mb-1.5">
+        <label htmlFor="name" className="block text-sm text-fg/60 mb-1.5">
           Name
         </label>
         <input
@@ -63,13 +63,13 @@ export default function ContactForm() {
           required
           value={form.name}
           onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          className="w-full rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+          className="w-full rounded-md bg-surface/5 border border-border/15 px-4 py-2.5 text-fg placeholder-fg/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
           placeholder="Your name"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm text-white/60 mb-1.5">
+        <label htmlFor="email" className="block text-sm text-fg/60 mb-1.5">
           Email
         </label>
         <input
@@ -78,13 +78,13 @@ export default function ContactForm() {
           required
           value={form.email}
           onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-          className="w-full rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+          className="w-full rounded-md bg-surface/5 border border-border/15 px-4 py-2.5 text-fg placeholder-fg/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
           placeholder="you@example.com"
         />
       </div>
 
       <div>
-        <label htmlFor="message" className="block text-sm text-white/60 mb-1.5">
+        <label htmlFor="message" className="block text-sm text-fg/60 mb-1.5">
           Message
         </label>
         <textarea
@@ -93,7 +93,7 @@ export default function ContactForm() {
           rows={5}
           value={form.message}
           onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-          className="w-full rounded-md bg-white/5 border border-white/15 px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent resize-none"
+          className="w-full rounded-md bg-surface/5 border border-border/15 px-4 py-2.5 text-fg placeholder-fg/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent resize-none"
           placeholder="What's on your mind?"
         />
       </div>
@@ -105,7 +105,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="bg-accent text-black font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform disabled:opacity-50 disabled:hover:scale-100"
+        className="bg-accent text-accent-ink font-medium px-5 py-2.5 rounded-md hover:scale-[1.03] transition-transform disabled:opacity-50 disabled:hover:scale-100"
       >
         {status === 'sending' ? 'Sending…' : 'Send message'}
       </button>

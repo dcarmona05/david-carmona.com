@@ -13,8 +13,8 @@ export default function ContactPage() {
     <div>
       <TopoBackground />
       <Reveal>
-        <h1 className="font-display font-bold text-3xl text-white">Contact</h1>
-        <p className="mt-3 text-white/60 max-w-xl leading-relaxed">
+        <h1 className="font-display font-bold text-3xl text-fg">Contact</h1>
+        <p className="mt-3 text-fg/60 max-w-xl leading-relaxed">
           Have a project, a role, or just want to talk design? Send a message,
           or grab time directly on my calendar.
         </p>

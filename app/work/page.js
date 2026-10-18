@@ -11,8 +11,8 @@ export default function WorkPage() {
   return (
     <div>
       <Reveal>
-        <h1 className="font-display font-bold text-3xl text-white">Work</h1>
-        <p className="mt-3 text-white/60 max-w-xl">
+        <h1 className="font-display font-bold text-3xl text-fg">Work</h1>
+        <p className="mt-3 text-fg/60 max-w-xl">
           A selection of projects spanning design systems, product design, and design operations.
         </p>
       </Reveal>

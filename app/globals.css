@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Theme tokens. Dark values are the site's original, unchanged colors (zero
+ * regression). Light values use a warm off-white bg and darkened accents for
+ * AA text contrast. The "-bright" accents stay the original punchy hexes in
+ * both themes, for decorative-only uses (HeroDoodle, TopoBackground, etc.)
+ * that don't need text contrast. "-ink" is the text/icon color to place on
+ * top of an accent-colored surface (e.g. a button).
+ */
+@layer base {
+  :root[data-theme='dark'] {
+    --color-bg: 10 10 10;
+    --color-fg: 255 255 255;
+    --color-surface: 255 255 255;
+    --color-border: 255 255 255;
+    --color-accent: 255 61 129;
+    --color-accent2: 217 255 61;
+    --color-accent3: 61 219 255;
+    --color-accent-bright: 255 61 129;
+    --color-accent2-bright: 217 255 61;
+    --color-accent3-bright: 61 219 255;
+    --color-accent-ink: 0 0 0;
+  }
+
+  :root[data-theme='light'] {
+    --color-bg: 250 249 246;
+    --color-fg: 20 20 20;
+    --color-surface: 20 20 20;
+    --color-border: 20 20 20;
+    --color-accent: 214 0 107;
+    --color-accent2: 122 143 0;
+    --color-accent3: 0 136 168;
+    --color-accent-bright: 255 61 129;
+    --color-accent2-bright: 217 255 61;
+    --color-accent3-bright: 61 219 255;
+    --color-accent-ink: 255 255 255;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }

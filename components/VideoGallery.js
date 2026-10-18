@@ -9,7 +9,7 @@ export default function VideoGallery({ videos }) {
           href={video.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="group rounded-lg border border-white/10 overflow-hidden hover:border-white/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="group rounded-lg border border-border/10 overflow-hidden hover:border-border/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           <div className="relative aspect-video bg-black">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -27,7 +27,7 @@ export default function VideoGallery({ videos }) {
               </span>
             </div>
           </div>
-          <p className="px-4 py-3 text-sm text-white/70 group-hover:text-white transition-colors">
+          <p className="px-4 py-3 text-sm text-fg/70 group-hover:text-fg transition-colors">
             {video.title}
           </p>
         </a>

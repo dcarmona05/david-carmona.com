@@ -11,14 +11,14 @@ const WELCOME_MESSAGE = {
 
 function ChatHeader({ onMinimize, onExpand, onClose, isFull }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 shrink-0">
-      <span className="font-display font-medium text-white text-sm">Ask about {siteConfig.name}</span>
+    <div className="flex items-center justify-between px-4 py-3 border-b border-border/10 shrink-0">
+      <span className="font-display font-medium text-fg text-sm">Ask about {siteConfig.name}</span>
       <div className="flex items-center gap-3">
         {!isFull && onExpand && (
           <button
             type="button"
             onClick={onExpand}
-            className="text-white/40 hover:text-white transition-colors"
+            className="text-fg/40 hover:text-fg transition-colors"
             aria-label="Expand to full screen"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" strokeWidth="2">
@@ -29,7 +29,7 @@ function ChatHeader({ onMinimize, onExpand, onClose, isFull }) {
         <button
           type="button"
           onClick={onMinimize}
-          className="text-white/40 hover:text-white transition-colors"
+          className="text-fg/40 hover:text-fg transition-colors"
           aria-label={isFull ? 'Dock chat' : 'Minimize chat'}
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" strokeWidth="2">
@@ -40,7 +40,7 @@ function ChatHeader({ onMinimize, onExpand, onClose, isFull }) {
           <button
             type="button"
             onClick={onClose}
-            className="text-white/40 hover:text-white transition-colors"
+            className="text-fg/40 hover:text-fg transition-colors"
             aria-label="Close chat"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-current" strokeWidth="2">
@@ -65,14 +65,14 @@ function ChatBody({ messages, loading, scrollRef }) {
         <div
           key={i}
           className={`max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${
-            m.role === 'user' ? 'bg-accent text-black ml-auto' : 'bg-white/5 text-white/80'
+            m.role === 'user' ? 'bg-accent text-accent-ink ml-auto' : 'bg-surface/5 text-fg/80'
           }`}
         >
           {m.content}
         </div>
       ))}
       {loading && (
-        <div className="max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm bg-white/5 text-white/40">Thinking…</div>
+        <div className="max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm bg-surface/5 text-fg/40">Thinking…</div>
       )}
       <div ref={scrollRef} />
     </div>
@@ -81,18 +81,18 @@ function ChatBody({ messages, loading, scrollRef }) {
 
 function ChatInput({ input, setInput, onSubmit, loading }) {
   return (
-    <form onSubmit={onSubmit} className="flex items-center gap-2 border-t border-white/10 p-3 shrink-0">
+    <form onSubmit={onSubmit} className="flex items-center gap-2 border-t border-border/10 p-3 shrink-0">
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder="Ask a question…"
-        className="flex-1 bg-white/5 border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
+        className="flex-1 bg-surface/5 border border-border/15 rounded-md px-3 py-2 text-sm text-fg placeholder-fg/30 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent"
       />
       <button
         type="submit"
         disabled={loading || !input.trim()}
-        className="bg-accent text-black text-sm font-medium px-3.5 py-2 rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
+        className="bg-accent text-accent-ink text-sm font-medium px-3.5 py-2 rounded-md disabled:opacity-40 disabled:cursor-not-allowed"
       >
         Send
       </button>
@@ -168,9 +168,9 @@ export default function AgentChat() {
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
             onClick={() => setView('docked')}
-            className="flex items-center gap-2 bg-accent text-black font-medium pl-4 pr-5 py-3 rounded-full shadow-lg hover:scale-[1.03] transition-transform"
+            className="flex items-center gap-2 bg-accent text-accent-ink font-medium pl-4 pr-5 py-3 rounded-full shadow-lg hover:scale-[1.03] transition-transform"
           >
-            <span className="w-2 h-2 rounded-full bg-black/70" />
+            <span className="w-2 h-2 rounded-full bg-accent-ink/70" />
             Ask me anything
           </motion.button>
         )}
@@ -182,7 +182,7 @@ export default function AgentChat() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.2 }}
-            className="w-[360px] h-[500px] bg-[#0A0A0A] border border-white/15 rounded-lg shadow-2xl flex flex-col overflow-hidden"
+            className="w-[360px] h-[500px] bg-bg border border-border/15 rounded-lg shadow-2xl flex flex-col overflow-hidden"
           >
             <ChatHeader
               onExpand={() => setView('full')}
@@ -200,7 +200,7 @@ export default function AgentChat() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-[#0A0A0A] flex flex-col z-50"
+            className="fixed inset-0 bg-bg flex flex-col z-50"
           >
             <ChatHeader
               isFull
