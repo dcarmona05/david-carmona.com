@@ -100,12 +100,24 @@ function ChatInput({ input, setInput, onSubmit, loading }) {
   );
 }
 
+// Pops up on its own after a short delay instead of sitting there the
+// instant the page loads — David asked for it to feel like it arrives
+// rather than being part of the initial furniture.
+const INITIAL_POPUP_DELAY_MS = 12000;
+
 export default function AgentChat() {
-  const [view, setView] = useState('closed');
+  const [view, setView] = useState('hidden');
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setView((current) => (current === 'hidden' ? 'closed' : current));
+    }, INITIAL_POPUP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (messages.length === 0) return;
