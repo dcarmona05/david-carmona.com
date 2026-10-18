@@ -29,7 +29,10 @@ export default function CollabToolbar({
   onSelectSticker,
 }) {
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
+    // Docked higher up on narrow screens so it never shares horizontal
+    // space with AgentChat's bottom-right bubble — at sm+ there's enough
+    // width for both side by side.
+    <div className="fixed bottom-24 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2">
       {!isLive && (
         <p className="rounded-full bg-bg/90 border border-border/10 backdrop-blur-md px-3 py-1 text-[11px] text-fg/50 shadow-sm">
           Collaboration is offline right now — your drawings stay local to you

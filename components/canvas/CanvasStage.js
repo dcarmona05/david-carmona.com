@@ -6,6 +6,24 @@ import { useReducedMotion } from 'framer-motion';
 
 const PAN_STEP = 140;
 const FOCUSABLE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
+const MIN_FIT_SCALE = 0.4;
+const MAX_FIT_SCALE = 1.15;
+const TOP_MARGIN = 96; // clears CanvasNav, docked at top-20
+
+// Mirrors react-zoom-pan-pinch's own internal getOffset() exactly (same
+// formula, read from its source) — needed because our own pan target below
+// has to land in the same coordinate system zoomToElement computes.
+function getWorldOffset(el, wrapperEl, contentEl, scale) {
+  const elRect = el.getBoundingClientRect();
+  const wrapperRect = wrapperEl.getBoundingClientRect();
+  const contentRect = contentEl.getBoundingClientRect();
+  const xOff = wrapperRect.x * scale;
+  const yOff = wrapperRect.y * scale;
+  return {
+    x: (elRect.x - contentRect.x + xOff) / scale,
+    y: (elRect.y - contentRect.y + yOff) / scale,
+  };
+}
 
 /**
  * The pan/zoom camera for the canvas front door (Phase 3). Renders real
@@ -35,12 +53,42 @@ const CanvasStage = forwardRef(function CanvasStage(
   const lastFocusedRegionRef = useRef(initialRegionId ?? null);
   const reducedMotion = useReducedMotion();
 
+  // Now that regions stack vertically with very different heights (a tall
+  // Work grid vs. a short Contact form), zoomToElement's default "fit the
+  // whole frame in view, centered" behavior zooms out so far on a tall
+  // region that its content becomes unreadably small (confirmed: Work's
+  // ~2150px-tall frame forced scale down to the 0.4 floor, and still didn't
+  // fully fit). Instead: fit the frame's WIDTH only (ignore height — a
+  // region taller than the viewport is just scrolled/panned within, same
+  // as a normal page section), and align its TOP near the top of the
+  // viewport rather than vertically centering it, which is what actually
+  // reads as "jump to this section" instead of "jump to its middle."
   const panToRegion = useCallback(
     (regionId, { instant = false } = {}) => {
       const content = innerRef.current;
       if (!content || !regionId) return;
       const duration = instant || reducedMotion ? 0 : 450;
-      content.zoomToElement(`canvas-frame-${regionId}`, undefined, duration, 'easeOut');
+      const el = document.getElementById(`canvas-frame-${regionId}`);
+      const wrapperEl = content.instance?.wrapperComponent;
+      const contentEl = content.instance?.contentComponent;
+
+      if (!el || !wrapperEl || !contentEl) {
+        content.zoomToElement(`canvas-frame-${regionId}`, undefined, duration, 'easeOut');
+        return;
+      }
+
+      const { scale: currentScale } = content.instance.transformState;
+      const elRect = el.getBoundingClientRect();
+      const wrapperRect = wrapperEl.getBoundingClientRect();
+      const nodeWidth = elRect.width / currentScale;
+      const targetScale = Math.min(Math.max(wrapperRect.width / nodeWidth, MIN_FIT_SCALE), MAX_FIT_SCALE);
+
+      const worldOffset = getWorldOffset(el, wrapperEl, contentEl, currentScale);
+      const offsetX = (wrapperRect.width - nodeWidth * targetScale) / 2;
+      const positionX = (wrapperRect.left - worldOffset.x) * targetScale + offsetX;
+      const positionY = (wrapperRect.top - worldOffset.y) * targetScale + TOP_MARGIN;
+
+      content.setTransform(positionX, positionY, targetScale, duration, 'easeOut');
     },
     [reducedMotion]
   );

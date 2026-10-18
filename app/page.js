@@ -21,18 +21,22 @@ import { work } from '@/lib/work';
 import { getIdentity } from '@/lib/identity';
 import { startPresence, subscribeVisitCount, countVisitOnce } from '@/lib/presence';
 
-// World-space layout of the canvas regions. Positions are deliberately
-// loose/whiteboard-style, not a rigid grid — but left-to-right in the same
-// order as the DOM/Tab order below (Home, About, Work, Contact).
+// World-space layout of the canvas regions — stacked top-to-bottom (not
+// side-by-side) per David's preference for a vertical flow over side
+// scrolling, in the same order as the DOM/Tab order below (Home, About,
+// Work, Contact). Each region is horizontally centered on a shared
+// 1200px-wide column; y positions have generous gaps since Frame's height
+// is auto (sized to its real content), not fixed, so these are deliberately
+// loose estimates, not pixel-exact.
+const WORLD_WIDTH = 1200;
 const REGIONS = [
-  { id: 'home', label: 'Home', x: 80, y: 60, width: 620 },
-  { id: 'about', label: 'About', x: 900, y: 20, width: 560 },
-  { id: 'work', label: 'Work', x: 1620, y: 0, width: 1040 },
-  { id: 'contact', label: 'Contact', x: 2820, y: 60, width: 560 },
+  { id: 'home', label: 'Home', x: (WORLD_WIDTH - 620) / 2, y: 60, width: 620 },
+  { id: 'about', label: 'About', x: (WORLD_WIDTH - 560) / 2, y: 640, width: 560 },
+  { id: 'work', label: 'Work', x: (WORLD_WIDTH - 1040) / 2, y: 1180, width: 1040 },
+  { id: 'contact', label: 'Contact', x: (WORLD_WIDTH - 560) / 2, y: 3640, width: 560 },
 ];
 
-const WORLD_WIDTH = 3500;
-const WORLD_HEIGHT = 1300;
+const WORLD_HEIGHT = 4500;
 
 // Rendered once per region id, used by both the canvas Frame layout and the
 // stacked skip-link fallback — same component, not a second copy to

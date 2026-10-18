@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { siteConfig } from '@/lib/site';
 import ThemeToggle from './ThemeToggle';
 
@@ -13,6 +14,11 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  // The canvas page (/) has its own CanvasNav doing the same Home/About/
+  // Work/Contact navigation, front and center — showing this nav too would
+  // be two navigations for the same thing, so it's hidden there (logo and
+  // theme toggle still show everywhere).
+  const isCanvasPage = usePathname() === '/';
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/10 bg-bg/70 backdrop-blur-md">
@@ -25,37 +31,41 @@ export default function Header() {
         </Link>
 
         <div className="hidden sm:flex items-center gap-8">
-          <nav className="flex gap-8">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-fg/60 hover:text-accent transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          {!isCanvasPage && (
+            <nav className="flex gap-8">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-fg/60 hover:text-accent transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          )}
           <ThemeToggle />
         </div>
 
         <div className="flex items-center gap-2 sm:hidden">
           <ThemeToggle />
-          <button
-            type="button"
-            className="p-2 -mr-2"
-            aria-label="Toggle menu"
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-          >
-            <span className="block w-5 h-0.5 bg-fg mb-1.5" />
-            <span className="block w-5 h-0.5 bg-fg mb-1.5" />
-            <span className="block w-5 h-0.5 bg-fg" />
-          </button>
+          {!isCanvasPage && (
+            <button
+              type="button"
+              className="p-2 -mr-2"
+              aria-label="Toggle menu"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+            >
+              <span className="block w-5 h-0.5 bg-fg mb-1.5" />
+              <span className="block w-5 h-0.5 bg-fg mb-1.5" />
+              <span className="block w-5 h-0.5 bg-fg" />
+            </button>
+          )}
         </div>
       </div>
 
-      {open && (
+      {open && !isCanvasPage && (
         <nav className="sm:hidden border-t border-border/10 px-6 py-4 flex flex-col gap-4">
           {NAV_LINKS.map((link) => (
             <Link
