@@ -11,7 +11,11 @@ import RoleResponsibilities from '@/components/RoleResponsibilities';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
 export function generateStaticParams() {
-  return work.map((item) => ({ slug: item.slug }));
+  // 'otto-for-contact-center' has a dedicated page at app/work/otto-for-contact-center/page.js
+  // (a literal route segment takes precedence over this dynamic one in Next.js App Router).
+  return work
+    .filter((item) => item.slug !== 'otto-for-contact-center')
+    .map((item) => ({ slug: item.slug }));
 }
 
 export function generateMetadata({ params }) {
