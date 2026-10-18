@@ -4,6 +4,7 @@ import Reveal from '@/components/Reveal';
 import HeroVideo from '@/components/HeroVideo';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
+import PageShell from '@/components/PageShell';
 import { getWorkBySlug, getNextWork } from '@/lib/work';
 
 const item = getWorkBySlug('otto-for-contact-center');
@@ -79,6 +80,7 @@ export default function OttoCaseStudyPage() {
   const next = getNextWork(item.slug);
 
   return (
+    <PageShell>
     <div>
       <Reveal>
         <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
@@ -376,5 +378,6 @@ export default function OttoCaseStudyPage() {
         </div>
       </Reveal>
     </div>
+    </PageShell>
   );
 }

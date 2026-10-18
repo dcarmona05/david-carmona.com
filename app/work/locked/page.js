@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import PageShell from '@/components/PageShell';
 
 function LockedForm() {
   const searchParams = useSearchParams();
@@ -65,8 +66,10 @@ function LockedForm() {
 
 export default function LockedPage() {
   return (
-    <Suspense fallback={null}>
-      <LockedForm />
-    </Suspense>
+    <PageShell>
+      <Suspense fallback={null}>
+        <LockedForm />
+      </Suspense>
+    </PageShell>
   );
 }

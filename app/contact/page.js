@@ -2,6 +2,7 @@ import Reveal from '@/components/Reveal';
 import ContactForm from '@/components/ContactForm';
 import CalEmbed from '@/components/CalEmbed';
 import TopoBackground from '@/components/TopoBackground';
+import PageShell from '@/components/PageShell';
 
 export const metadata = {
   title: 'Contact',
@@ -10,25 +11,27 @@ export const metadata = {
 
 export default function ContactPage() {
   return (
-    <div>
-      <TopoBackground />
-      <Reveal>
-        <h1 className="font-display font-bold text-3xl text-fg">Contact</h1>
-        <p className="mt-3 text-fg/60 max-w-xl leading-relaxed">
-          Have a project, a role, or just want to talk design? Send a message,
-          or grab time directly on my calendar.
-        </p>
-      </Reveal>
-
-      <div className="mt-10 grid lg:grid-cols-2 gap-10">
-        <Reveal delay={0.1}>
-          <ContactForm />
+    <PageShell>
+      <div>
+        <TopoBackground />
+        <Reveal>
+          <h1 className="font-display font-bold text-3xl text-fg">Contact</h1>
+          <p className="mt-3 text-fg/60 max-w-xl leading-relaxed">
+            Have a project, a role, or just want to talk design? Send a message,
+            or grab time directly on my calendar.
+          </p>
         </Reveal>
 
-        <Reveal delay={0.15}>
-          <CalEmbed />
-        </Reveal>
+        <div className="mt-10 grid lg:grid-cols-2 gap-10">
+          <Reveal delay={0.1}>
+            <ContactForm />
+          </Reveal>
+
+          <Reveal delay={0.15}>
+            <CalEmbed />
+          </Reveal>
+        </div>
       </div>
-    </div>
+    </PageShell>
   );
 }

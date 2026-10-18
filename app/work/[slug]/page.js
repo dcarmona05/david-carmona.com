@@ -9,6 +9,7 @@ import ScreenshotGallery from '@/components/ScreenshotGallery';
 import VideoDemo from '@/components/VideoDemo';
 import VideoGallery from '@/components/VideoGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
+import PageShell from '@/components/PageShell';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
 export function generateStaticParams() {
@@ -32,6 +33,7 @@ export default function CaseStudyPage({ params }) {
   const next = getNextWork(item.slug);
 
   return (
+    <PageShell>
     <div>
       <Reveal>
         <Link href="/work" className="text-sm text-fg/60 hover:text-accent transition-colors">
@@ -194,5 +196,6 @@ export default function CaseStudyPage({ params }) {
         </div>
       </Reveal>
     </div>
+    </PageShell>
   );
 }

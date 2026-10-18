@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
             <Header />
-            <main className="flex-1 max-w-5xl w-full mx-auto px-6 py-16">
+            <main className="flex-1 w-full">
               {children}
             </main>
             <Footer />
