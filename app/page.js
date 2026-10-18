@@ -48,7 +48,7 @@ function RegionContent({ id }) {
           {siteConfig.name}
         </h1>
         <p className="mt-2 text-lg text-fg/60">{siteConfig.role}</p>
-        <p className="mt-6 max-w-md text-fg/70 leading-relaxed">
+        <p className="mt-6 max-w-md text-fg/70 leading-relaxed text-balance">
           {siteConfig.heroDescription}
         </p>
         <Link
@@ -103,7 +103,7 @@ function RegionContent({ id }) {
   return (
     <div>
       <h2 className="font-display font-bold text-2xl text-fg">Contact</h2>
-      <p className="mt-3 text-fg/60 leading-relaxed">
+      <p className="mt-3 text-fg/60 leading-relaxed text-balance">
         Have a project, a role, or just want to talk design? Send a message
         below, or head to the{' '}
         <Link href="/contact" className="text-accent hover:underline">
