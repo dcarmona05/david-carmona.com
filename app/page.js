@@ -24,19 +24,21 @@ import { startPresence, subscribeVisitCount, countVisitOnce } from '@/lib/presen
 // World-space layout of the canvas regions — stacked top-to-bottom (not
 // side-by-side) per David's preference for a vertical flow over side
 // scrolling, in the same order as the DOM/Tab order below (Home, About,
-// Work, Contact). Each region is horizontally centered on a shared
-// 1200px-wide column; y positions have generous gaps since Frame's height
-// is auto (sized to its real content), not fixed, so these are deliberately
-// loose estimates, not pixel-exact.
-const WORLD_WIDTH = 1200;
+// Work, Contact). Every region shares one uniform width (not a different
+// one per region) and a tighter, consistent gap, rather than the looser,
+// varied sizing from the first pass — Frame's height is still auto (sized
+// to its real content), so these y positions are estimates, not pixel-exact.
+const REGION_WIDTH = 700;
+const WORLD_WIDTH = REGION_WIDTH + 200;
+const REGION_X = (WORLD_WIDTH - REGION_WIDTH) / 2;
 const REGIONS = [
-  { id: 'home', label: 'Home', x: (WORLD_WIDTH - 620) / 2, y: 60, width: 620 },
-  { id: 'about', label: 'About', x: (WORLD_WIDTH - 560) / 2, y: 640, width: 560 },
-  { id: 'work', label: 'Work', x: (WORLD_WIDTH - 1040) / 2, y: 1180, width: 1040 },
-  { id: 'contact', label: 'Contact', x: (WORLD_WIDTH - 560) / 2, y: 3640, width: 560 },
+  { id: 'home', label: 'Home', x: REGION_X, y: 60, width: REGION_WIDTH },
+  { id: 'about', label: 'About', x: REGION_X, y: 580, width: REGION_WIDTH },
+  { id: 'work', label: 'Work', x: REGION_X, y: 1060, width: REGION_WIDTH },
+  { id: 'contact', label: 'Contact', x: REGION_X, y: 2860, width: REGION_WIDTH },
 ];
 
-const WORLD_HEIGHT = 4500;
+const WORLD_HEIGHT = 3700;
 
 // Rendered once per region id, used by both the canvas Frame layout and the
 // stacked skip-link fallback — same component, not a second copy to
@@ -253,8 +255,15 @@ export default function HomePage() {
       </CanvasStage>
 
       <CanvasNav regions={REGIONS} active={activeRegion} onNavigate={panTo} />
-      <VisitorAvatars others={others} mine={myIdentity} />
-      <VisitCounter count={visitCount} />
+      {/* Hidden until presence is actually live (same `isLive` signal
+          CollabToolbar uses, from the shared Firebase connection) — a lone
+          avatar with no one else around just read as an unexplained dot. */}
+      {isLive && (
+        <>
+          <VisitorAvatars others={others} mine={myIdentity} />
+          <VisitCounter count={visitCount} />
+        </>
+      )}
 
       <CollabToolbar
         activeTool={activeTool}

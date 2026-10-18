@@ -235,9 +235,16 @@ const CanvasStage = forwardRef(function CanvasStage(
         maxScale={1.75}
         centerOnInit={false}
         limitToBounds={false}
-        wheel={{ step: 0.2 }}
+        // wheelDisabled + wheelPanning (below) is the Figma convention:
+        // a plain scroll/two-finger swipe pans instead of zooming; a real
+        // pinch gesture still zooms, since trackpads report that as a
+        // ctrl-key-modified wheel event, which wheelDisabled deliberately
+        // exempts (see react-zoom-pan-pinch's own isWheelAllowed/
+        // onWheelPanning source — this isn't a guess, it's how the library
+        // itself tells the two gestures apart).
+        wheel={{ step: 0.2, wheelDisabled: true }}
         doubleClick={{ disabled: true }}
-        panning={{ disabled: panningDisabled }}
+        panning={{ disabled: panningDisabled, wheelPanning: true }}
         pinch={{ disabled: panningDisabled }}
       >
         <TransformComponent
