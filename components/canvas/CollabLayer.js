@@ -3,16 +3,15 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import {
   subscribeToElements,
-  subscribeToFlags,
+  subscribeToPins,
   createElement,
   deleteElement,
-  flagItem,
-  countFlags,
+  togglePin,
+  countPins,
   loadLocalElements,
   saveLocalElements,
   MAX_PEN_POINTS,
   MAX_TEXT_LENGTH,
-  FLAG_HIDE_THRESHOLD,
   TEXT_SIZES,
   TEXT_FONTS,
 } from '@/lib/canvasSync';
@@ -96,9 +95,14 @@ const CollabLayer = forwardRef(function CollabLayer(
 ) {
   const [remoteElements, setRemoteElements] = useState({});
   const [localElements, setLocalElements] = useState({});
-  const [flags, setFlags] = useState({});
+  const [pins, setPins] = useState({});
+  // Real bug caught while testing: togglePin needs `myUid`, which is null
+  // whenever Firebase auth fails (the actual current state) -- without
+  // this, `isPinnedByMe` could never become true and clicking Pin would
+  // silently do nothing, unlike every other tool here, which all have a
+  // local-optimistic fallback. This is that fallback for pins.
+  const [localPinIds, setLocalPinIds] = useState(() => new Set());
   const [myUid, setMyUid] = useState(null);
-  const [flaggedByMe, setFlaggedByMe] = useState(() => new Set());
   // Text tool: click-to-place, with its style options in the same step.
   const [textDraft, setTextDraft] = useState(null); // { x, y, text, color, size, font }
   // Frame tool: draw-to-size first ('drawing'), then a label/color step
@@ -141,7 +145,7 @@ const CollabLayer = forwardRef(function CollabLayer(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => subscribeToFlags(({ items }) => setFlags(items || {})), []);
+  useEffect(() => subscribeToPins(({ items }) => setPins(items || {})), []);
 
   const commitLocal = useCallback(async (tempId, payload) => {
     const identity = identityRef.current || getIdentity();
@@ -324,9 +328,14 @@ const CollabLayer = forwardRef(function CollabLayer(
     setFrameDraft(null);
   }
 
-  async function handleFlag(id) {
-    setFlaggedByMe((prev) => new Set(prev).add(id));
-    await flagItem(id);
+  async function handlePin(id, isPinnedByMe) {
+    setLocalPinIds((prev) => {
+      const next = new Set(prev);
+      if (isPinnedByMe) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    await togglePin(id, isPinnedByMe);
   }
 
   async function handleDelete(id) {
@@ -359,14 +368,13 @@ const CollabLayer = forwardRef(function CollabLayer(
   return (
     <>
       {entries.map(([id, el]) => {
-        const flagCount = countFlags(flags, id);
-        const isHidden = flagCount >= FLAG_HIDE_THRESHOLD;
+        const isPinnedByMe = localPinIds.has(id) || !!(myUid && pins[id]?.[myUid]);
+        const isPinned = isPinnedByMe || countPins(pins, id) > 0;
         // A not-yet-synced element only exists in this visitor's own
         // browser, so they can always delete it regardless of auth state —
         // there's nothing shared yet to need a permission check for.
         const isLocalOnly = id in localElements && !(id in remoteElements);
         const canModerate = isLocalOnly || (myUid && (myUid === el.authorUid || myUid === OWNER_UID));
-        if (isHidden && !canModerate) return null;
 
         if (el.type === 'pen') {
           const xs = el.points.map((p) => p[0]);
@@ -385,7 +393,6 @@ const CollabLayer = forwardRef(function CollabLayer(
                   strokeWidth={3}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  opacity={isHidden ? 0.3 : 1}
                 />
               </svg>
               {/* Redesigned per feedback: the old pair of bare circular
@@ -409,17 +416,18 @@ const CollabLayer = forwardRef(function CollabLayer(
                     ✕
                   </button>
                 )}
-                {!flaggedByMe.has(id) && (
-                  <button
-                    type="button"
-                    onClick={() => handleFlag(id)}
-                    aria-label="Flag drawing as inappropriate"
-                    title="Flag"
-                    className="w-6 h-6 rounded-full text-xs text-fg/70 hover:bg-surface/10 hover:text-accent flex items-center justify-center"
-                  >
-                    ⚑
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => handlePin(id, isPinnedByMe)}
+                  aria-label={isPinnedByMe ? 'Unpin drawing' : 'Pin drawing'}
+                  aria-pressed={isPinned}
+                  title={isPinnedByMe ? 'Unpin' : 'Pin'}
+                  className={`w-6 h-6 rounded-full text-xs flex items-center justify-center ${
+                    isPinned ? 'text-accent' : 'text-fg/70 hover:bg-surface/10 hover:text-accent'
+                  }`}
+                >
+                  📌
+                </button>
               </div>
             </div>
           );
@@ -437,16 +445,18 @@ const CollabLayer = forwardRef(function CollabLayer(
                 ✕
               </button>
             )}
-            {!flaggedByMe.has(id) && (
-              <button
-                type="button"
-                onClick={() => handleFlag(id)}
-                aria-label="Flag as inappropriate"
-                className="w-5 h-5 rounded-full bg-bg border border-border/20 text-[10px] text-fg/70 hover:text-accent flex items-center justify-center shadow"
-              >
-                ⚑
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => handlePin(id, isPinnedByMe)}
+              aria-label={isPinnedByMe ? 'Unpin' : 'Pin'}
+              aria-pressed={isPinned}
+              title={isPinnedByMe ? 'Unpin' : 'Pin'}
+              className={`w-5 h-5 rounded-full bg-bg border text-[10px] flex items-center justify-center shadow ${
+                isPinned ? 'border-accent text-accent' : 'border-border/20 text-fg/70 hover:text-accent'
+              }`}
+            >
+              📌
+            </button>
           </span>
         );
 
@@ -455,7 +465,7 @@ const CollabLayer = forwardRef(function CollabLayer(
             <div
               key={id}
               className="group absolute text-3xl select-none"
-              style={{ left: el.x - 18, top: el.y - 18, opacity: isHidden ? 0.3 : 1 }}
+              style={{ left: el.x - 18, top: el.y - 18 }}
               title={`${el.authorNickname || 'Someone'}'s sticker`}
             >
               {el.stickerId}
@@ -475,7 +485,6 @@ const CollabLayer = forwardRef(function CollabLayer(
                 width: el.width,
                 height: el.height,
                 borderColor: el.color || '#FF3D81',
-                opacity: isHidden ? 0.3 : 1,
               }}
             >
               {el.text && (
@@ -495,7 +504,7 @@ const CollabLayer = forwardRef(function CollabLayer(
             className={`group absolute max-w-[220px] font-medium px-2 py-1 rounded bg-bg/80 border ${textSizeClass(
               el.fontSize
             )} ${textFontClass(el.fontFamily)}`}
-            style={{ left: el.x, top: el.y, borderColor: el.color, color: el.color, opacity: isHidden ? 0.3 : 1 }}
+            style={{ left: el.x, top: el.y, borderColor: el.color, color: el.color }}
           >
             {el.text}
             {controls}

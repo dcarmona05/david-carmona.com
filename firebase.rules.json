@@ -36,7 +36,7 @@
         "$commentId": {
           ".write": "auth != null && (!data.exists() || data.child('authorUid').val() === auth.uid || auth.uid === 'REPLACE_WITH_OWNER_UID')",
           ".validate": "newData.hasChildren(['regionId', 'text', 'authorUid', 'authorNickname', 'createdAt']) || !newData.exists()",
-          "regionId": { ".validate": "newData.val() === 'home' || newData.val() === 'about' || newData.val() === 'work' || newData.val() === 'contact'" },
+          "regionId": { ".validate": "newData.val() === 'home' || newData.val() === 'work' || newData.val() === 'contact'" },
           "text": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 280" },
           "authorUid": { ".validate": "newData.val() === auth.uid" },
           "authorNickname": { ".validate": "newData.isString() && newData.val().length <= 40" },
@@ -46,11 +46,11 @@
       },
 
       "moderation": {
-        "flags": {
+        "pins": {
           ".read": "auth != null",
           "$itemId": {
-            "$flaggerUid": {
-              ".write": "auth != null && auth.uid === $flaggerUid",
+            "$pinnerUid": {
+              ".write": "auth != null && auth.uid === $pinnerUid",
               ".validate": "newData.val() === true"
             }
           }
