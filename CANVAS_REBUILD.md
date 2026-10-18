@@ -4,7 +4,7 @@ Planned in a Claude Code session on 2026-10-17 (plan mode, approved). Read this 
 
 ## Status
 
-- [ ] **Phase 0** — Firebase account setup (David's action)
+- [x] **Phase 0** — Firebase account setup (David's action)
 - [x] **Phase 1** — Light/dark theme system
 - [ ] **Phase 2** — `PageShell` extraction
 - [ ] **Phase 3** — Canvas engine + static frames (no multiplayer)
@@ -98,3 +98,4 @@ This is realistically 5+ separate build sessions, not one sitting. Start a **fre
   - One real catch during the Otto page migration: the swimlane legend's "Banker" dot was hardcoded `bg-white`, which would've gone nearly invisible against the light theme's cream background. Changed to `bg-fg` so it correctly inverts to a dark dot in light mode (confirmed visually) — the lime/cyan Customer/Otto dots didn't have this problem since they're already accent-token colors.
   - **Verified**: `npm run build` clean (no type/lint errors). Visually confirmed both themes via Playwright on `/`, `/about`, `/contact`, `/work` (unlocked), a generic case study (`ai-powered-disputes-workspace`), and the Otto page (full scroll, swimlane, screenshot gallery, stats, blockquote) — all legible with correct contrast, zero visual regression in dark mode (side-by-side matches pre-change screenshots), no hydration warnings/errors in console, and `localStorage` persistence survives a reload with no flash-of-wrong-theme (script runs before paint).
   - Noted but **not fixed** (pre-existing, unrelated to this phase): `middleware.js`'s `/work/:path*` matcher also catches static image requests like `/work/otto-contact-center/*.png` while `/work` is still locked, 307-redirecting them — harmless (images 404/broken-icon only while locked; they load fine once unlocked) but worth a dedicated fix later.
+- **2026-10-17**: **Phase 0 (Firebase account setup) done.** David created the `portfolio` Firebase project (Spark/free plan), registered a web app, created the Realtime Database in **locked mode** (`.read`/`.write`: `false` — correct for now, real rules come in Phase 4), and enabled **Anonymous sign-in** under Authentication. The 5 `NEXT_PUBLIC_FIREBASE_*` values were handed over (safe to share — Firebase web config is public by design, security lives in RTDB rules, not in hiding this config) and saved to the gitignored `.env.local`, with the var names also added to the committed `.env.local.example`. All 5 were also set in Netlify's dashboard env vars via `netlify env:set` (all contexts, all scopes) — confirmed present via `netlify env:list`. Nothing else consumes these yet; `lib/firebase.js`/`lib/presence.js` (Phase 4) is what will actually read them.
