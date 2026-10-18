@@ -34,16 +34,32 @@ export default function CaseStudyPage({ params }) {
         </Link>
 
         <div className={`relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-gradient-to-br ${item.accent}`}>
-          <svg className="absolute inset-0 w-full h-full opacity-30" aria-hidden="true">
-            <defs>
-              <pattern id={`dots-${item.slug}`} width="18" height="18" patternUnits="userSpaceOnUse">
-                <circle cx="1.5" cy="1.5" r="1.5" fill="white" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill={`url(#dots-${item.slug})`} />
-          </svg>
+          {item.heroImage ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={item.heroImage}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover object-top opacity-80"
+            />
+          ) : (
+            <svg className="absolute inset-0 w-full h-full opacity-30" aria-hidden="true">
+              <defs>
+                <pattern id={`dots-${item.slug}`} width="18" height="18" patternUnits="userSpaceOnUse">
+                  <circle cx="1.5" cy="1.5" r="1.5" fill="white" />
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill={`url(#dots-${item.slug})`} />
+            </svg>
+          )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          <div
+            className={
+              item.heroImage
+                ? 'absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10'
+                : 'absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent'
+            }
+          />
 
           <span className="absolute top-4 left-4 text-xs uppercase tracking-wide text-white/80 bg-black/30 rounded-full px-3 py-1">
             {item.company} &middot; {item.category}
