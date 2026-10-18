@@ -88,19 +88,17 @@ export default function OttoCaseStudyPage() {
 
         <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
           <HeroVideo src={item.videoUrl} poster={item.heroImage} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10 pointer-events-none" />
-
-          <span className="absolute top-4 left-4 text-xs uppercase tracking-wide text-white/80 bg-black/30 rounded-full px-3 py-1">
-            {item.company} &middot; {item.category}
-          </span>
-
-          <div className="absolute bottom-0 left-0 p-6">
-            <h1 className="font-display font-bold text-3xl sm:text-4xl text-white">{item.title}</h1>
-            <p className="mt-1 text-white/70">{item.role} &middot; {item.timeline}</p>
-          </div>
         </div>
 
-        <p className="mt-8 max-w-2xl text-lg text-white/70 leading-relaxed">{item.description}</p>
+        <div className="mt-6">
+          <span className="text-xs uppercase tracking-wide text-white/50 bg-white/5 rounded-full px-3 py-1">
+            {item.company} &middot; {item.category}
+          </span>
+          <h1 className="mt-4 font-display font-bold text-3xl sm:text-4xl text-white">{item.title}</h1>
+          <p className="mt-1 text-white/70">{item.role} &middot; {item.timeline}</p>
+        </div>
+
+        <p className="mt-6 max-w-2xl text-lg text-white/70 leading-relaxed">{item.description}</p>
       </Reveal>
 
       <Reveal delay={0.04}>
