@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useReducedMotion } from 'framer-motion';
 
@@ -45,6 +45,7 @@ const CanvasStage = forwardRef(function CanvasStage(
     onCanvasPointerMove,
     onCanvasPointerUp,
     onPointerPositionChange,
+    worldHeight,
   },
   ref
 ) {
@@ -52,6 +53,24 @@ const CanvasStage = forwardRef(function CanvasStage(
   const wrapperRef = useRef(null);
   const lastFocusedRegionRef = useRef(initialRegionId ?? null);
   const reducedMotion = useReducedMotion();
+  // Drives the custom scroll-position indicator below — the native
+  // scrollbar only tracks the page's real (tiny) scroll range below the
+  // canvas, since panning inside it is a CSS transform, not native scroll.
+  const [scrollTrack, setScrollTrack] = useState({ progress: 0, thumbFraction: 1 });
+
+  const updateScrollTrack = useCallback(
+    (state) => {
+      const wrapperEl = innerRef.current?.instance?.wrapperComponent;
+      if (!wrapperEl || !worldHeight) return;
+      const viewportHeight = wrapperEl.clientHeight;
+      const scaledWorldHeight = worldHeight * state.scale;
+      const scrollableRange = Math.max(scaledWorldHeight - viewportHeight, 0);
+      const progress = scrollableRange > 0 ? Math.min(Math.max(-state.positionY / scrollableRange, 0), 1) : 0;
+      const thumbFraction = Math.min(Math.max(viewportHeight / scaledWorldHeight, 0.05), 1);
+      setScrollTrack({ progress, thumbFraction });
+    },
+    [worldHeight]
+  );
 
   // Now that regions stack vertically with very different heights (a tall
   // Work grid vs. a short Contact form), zoomToElement's default "fit the
@@ -234,7 +253,13 @@ const CanvasStage = forwardRef(function CanvasStage(
         minScale={0.4}
         maxScale={1.75}
         centerOnInit={false}
-        limitToBounds={false}
+        // Keeps user-driven pan (drag/wheel/pinch) within the designed
+        // content area instead of letting it wander into empty space
+        // forever — our own programmatic panToRegion above uses
+        // setTransform directly, which this does NOT constrain, so jumping
+        // between regions is unaffected.
+        limitToBounds
+        onTransformed={(_ref, state) => updateScrollTrack(state)}
         // wheelDisabled + wheelPanning (below) is the Figma convention:
         // a plain scroll/two-finger swipe pans instead of zooming; a real
         // pinch gesture still zooms, since trackpads report that as a
@@ -254,6 +279,23 @@ const CanvasStage = forwardRef(function CanvasStage(
           {children}
         </TransformComponent>
       </TransformWrapper>
+
+      {/* Custom scroll-position indicator — the native document scrollbar
+          can't reflect this, since panning here is a CSS transform, not
+          real scrolling. Same accent styling as the real scrollbar so it
+          reads as "the same scrollbar," just the one that actually tracks
+          where you are. */}
+      {worldHeight && scrollTrack.thumbFraction < 1 && (
+        <div className="absolute right-1 top-2 bottom-2 w-1.5 pointer-events-none z-30">
+          <div
+            className="absolute right-0 w-1.5 rounded-full bg-accent"
+            style={{
+              height: `${scrollTrack.thumbFraction * 100}%`,
+              top: `${scrollTrack.progress * (1 - scrollTrack.thumbFraction) * 100}%`,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 });

@@ -229,6 +229,7 @@ export default function HomePage() {
         onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
         onCanvasPointerUp={(world, e) => collabRef.current?.handlePointerUp(world, e)}
         onPointerPositionChange={(world) => presenceApiRef.current.updateCursor(world.x, world.y)}
+        worldHeight={WORLD_HEIGHT}
       >
         <div className="relative" style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT }}>
           {REGIONS.map((region) => (
