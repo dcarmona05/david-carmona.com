@@ -46,6 +46,16 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Infinite-canvas dotted grid (Phase 3). Lives on the non-transformed
+   wrapper, not the transformed content div, so dot density stays constant
+   in screen space regardless of zoom level — matching how FigJam/Miro render
+   their background grid, rather than having dots scale with world-space
+   content. */
+.canvas-dot-grid {
+  background-image: radial-gradient(rgb(var(--color-fg) / 0.16) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 @keyframes doodle-spin {
   from { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(180deg) scale(1.06); }

@@ -22,21 +22,11 @@ export default function AboutPage() {
             <PhotoFrame src="/profile.jpg" alt={siteConfig.name} />
             <div>
               <h1 className="font-display font-bold text-3xl text-fg">About</h1>
-              <p className="mt-4 max-w-xl text-fg/70 leading-relaxed">
-                I'm a Principal Designer who has spent two decades turning
-                complex, fragmented software into products people can actually
-                reason about. Most recently that's meant leading design systems
-                and AI-assisted workflows at enterprise scale — first at
-                LinkedIn for over a decade, and now at ServiceNow.
-              </p>
-              <p className="mt-4 max-w-xl text-fg/70 leading-relaxed">
-                I care about the gap between "it technically works" and "it
-                feels considered" — the details of interaction, motion, and
-                language that make software trustworthy rather than just
-                functional. Outside of product work, I sit on the board of the
-                Monterey Peninsula Ballet Theatre, helping with marketing and
-                communications.
-              </p>
+              {siteConfig.bio.map((paragraph) => (
+                <p key={paragraph} className="mt-4 max-w-xl text-fg/70 leading-relaxed">
+                  {paragraph}
+                </p>
+              ))}
               <div className="mt-6 flex gap-4">
                 <a
                   href={siteConfig.resumeUrl}
