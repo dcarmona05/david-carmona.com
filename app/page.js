@@ -38,7 +38,11 @@ const REGIONS = [
   { id: 'contact', label: 'Contact', x: REGION_X, y: 2860, width: REGION_WIDTH },
 ];
 
-const WORLD_HEIGHT = 3700;
+// Tight-ish margin below Contact's estimated bottom (~3510) — now that
+// panning is bounded (limitToBounds), too generous a margin here means
+// hitting a big stretch of empty dotted canvas below Contact instead of
+// gliding past it, which read as "a weird black gap" at the bottom.
+const WORLD_HEIGHT = 3560;
 
 // Rendered once per region id, used by both the canvas Frame layout and the
 // stacked skip-link fallback — same component, not a second copy to
