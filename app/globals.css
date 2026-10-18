@@ -61,3 +61,36 @@ html {
     animation: none !important;
   }
 }
+
+/* Boot splash — a fixed-duration decorative intro shown on every fresh page load
+   (not on client-side route changes, since it lives in the root layout, which
+   persists across those). Pure CSS so it's present from first paint, no JS/hydration
+   timing involved. */
+@keyframes splash-fade-out {
+  0%, 68% { opacity: 1; visibility: visible; pointer-events: auto; }
+  100% { opacity: 0; visibility: hidden; pointer-events: none; }
+}
+
+@keyframes splash-progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.splash-root {
+  animation: splash-fade-out 1.3s ease forwards;
+}
+
+.splash-progress-fill {
+  width: 0%;
+  animation: splash-progress 0.9s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-root {
+    animation-duration: 0.01s;
+  }
+  .splash-progress-fill {
+    animation: none;
+    width: 100%;
+  }
+}

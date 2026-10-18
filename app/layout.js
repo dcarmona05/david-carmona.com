@@ -4,6 +4,7 @@ import { MotionConfig } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AgentChat from '@/components/AgentChat';
+import LoadingSplash from '@/components/LoadingSplash';
 import ThemeProvider from '@/components/ThemeProvider';
 import { siteConfig } from '@/lib/site';
 
@@ -55,6 +56,7 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="min-h-screen flex flex-col antialiased bg-bg text-fg">
+        <LoadingSplash />
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
             <Header />
