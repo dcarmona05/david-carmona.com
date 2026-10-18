@@ -1,7 +1,6 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
-import HeroVideo from '@/components/HeroVideo';
 import VideoDemo from '@/components/VideoDemo';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
@@ -87,7 +86,13 @@ export default function OttoCaseStudyPage() {
         </Link>
 
         <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
-          <HeroVideo src={item.videoUrl} poster={item.heroImage} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={item.heroImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
         </div>
 
         <div className="mt-6">
