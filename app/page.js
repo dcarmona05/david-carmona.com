@@ -8,6 +8,7 @@ import CollabToolbar from '@/components/canvas/CollabToolbar';
 import CollabLayer from '@/components/canvas/CollabLayer';
 import CommentsPanel from '@/components/canvas/CommentsPanel';
 import PresenceCursors from '@/components/canvas/PresenceCursors';
+import SignatureCursor from '@/components/canvas/SignatureCursor';
 import VisitorAvatars from '@/components/canvas/VisitorAvatars';
 import VisitCounter from '@/components/canvas/VisitCounter';
 import Frame from '@/components/canvas/Frame';
@@ -260,6 +261,8 @@ export default function HomePage() {
           <PresenceCursors others={others} />
         </div>
       </CanvasStage>
+
+      <SignatureCursor />
 
       <CanvasNav regions={REGIONS} active={activeRegion} onNavigate={panTo} />
       {/* Hidden until presence is actually live (same `isLive` signal
