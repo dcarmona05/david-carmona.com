@@ -205,6 +205,34 @@ export default function HomePage() {
     stageRef.current?.panToRegion(id);
   }, []);
 
+  // Real bug David reported: scrolling (trackpad/wheel) did nothing while
+  // the cursor rested over CanvasNav or CollabToolbar. Both are fixed
+  // elements that sit visually *on top of* the canvas but are siblings in
+  // the DOM, not descendants of CanvasStage's own wrapper -- the pan
+  // library's own wheel listener is attached to that wrapper specifically,
+  // so it never sees wheel events whose target is one of these overlays.
+  // Confirmed directly: wheel over a clear patch of canvas panned
+  // correctly, wheel over either overlay produced zero transform change.
+  // This forwards those events into the same camera instead, while still
+  // leaving a genuinely scrollable region (CommentsPanel's message list,
+  // tagged `data-scroll-region`) to scroll itself normally.
+  useEffect(() => {
+    // Matches CanvasStage's own `panningDisabled` condition below -- the
+    // library already stops wheel-panning itself while a create-tool is
+    // active, so this supplemental path needs to agree, not just always pan.
+    if (mode !== 'canvas' || activeTool !== 'move') return undefined;
+    function onWheel(event) {
+      if (!stageRef.current) return;
+      const target = event.target;
+      if (target.closest?.('.canvas-dot-grid')) return; // already handled by the library there
+      if (target.closest?.('[data-scroll-region]')) return; // let it scroll itself
+      event.preventDefault();
+      stageRef.current.panByDelta(-event.deltaX, -event.deltaY);
+    }
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => window.removeEventListener('wheel', onWheel);
+  }, [mode, activeTool]);
+
   const selectTool = useCallback((tool) => {
     setActiveTool((current) => (current === tool ? 'move' : tool));
     setPendingSticker(null);

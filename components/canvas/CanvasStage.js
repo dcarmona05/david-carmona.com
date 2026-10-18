@@ -114,7 +114,25 @@ const CanvasStage = forwardRef(function CanvasStage(
     };
   }, []);
 
-  useImperativeHandle(ref, () => ({ panToRegion, screenToWorld }), [panToRegion, screenToWorld]);
+  // Raw screen-pixel pan, no fitting/alignment — used by the arrow-key
+  // handler below, and exposed via ref so a wheel event that lands on a
+  // fixed UI element sitting *on top of* the canvas (CanvasNav,
+  // CollabToolbar — real elements, not part of this wrapper's own DOM
+  // subtree, so the library's own wheel listener never sees those events)
+  // can still move the camera instead of silently doing nothing. See
+  // app/page.js's window-level wheel listener.
+  const panByDelta = useCallback((dx, dy) => {
+    const content = innerRef.current;
+    if (!content) return;
+    const { positionX, positionY, scale } = content.instance.transformState;
+    content.setTransform(positionX + dx, positionY + dy, scale, 0, 'linear');
+  }, []);
+
+  useImperativeHandle(ref, () => ({ panToRegion, screenToWorld, panByDelta }), [
+    panToRegion,
+    screenToWorld,
+    panByDelta,
+  ]);
 
   // Snap to the initial region once on mount, instantly — no animated jump
   // the moment the page loads. Uses a double requestAnimationFrame rather
