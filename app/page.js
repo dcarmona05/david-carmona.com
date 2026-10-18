@@ -35,14 +35,17 @@ const REGIONS = [
   { id: 'home', label: 'Home', x: REGION_X, y: 60, width: REGION_WIDTH },
   { id: 'about', label: 'About', x: REGION_X, y: 580, width: REGION_WIDTH },
   { id: 'work', label: 'Work', x: REGION_X, y: 1060, width: REGION_WIDTH },
-  { id: 'contact', label: 'Contact', x: REGION_X, y: 2860, width: REGION_WIDTH },
+  // Real bug: at REGION_WIDTH=700, Work's 2-col/4-row grid of 7 cards
+  // renders far taller (~2420px) than the original estimate (~1700px) —
+  // confirmed via a screenshot showing Contact's frame overlapping right
+  // into the bottom of Work's last card. Pushed down to actually clear it.
+  { id: 'contact', label: 'Contact', x: REGION_X, y: 3600, width: REGION_WIDTH },
 ];
 
-// Tight-ish margin below Contact's estimated bottom (~3510) — now that
-// panning is bounded (limitToBounds), too generous a margin here means
-// hitting a big stretch of empty dotted canvas below Contact instead of
-// gliding past it, which read as "a weird black gap" at the bottom.
-const WORLD_HEIGHT = 3560;
+// Contact's estimated bottom (~3600 + ~650) plus a small margin — tight on
+// purpose (see the 2026-10-18 entry in CANVAS_REBUILD.md on why too
+// generous a margin here is its own bug now that panning is bounded).
+const WORLD_HEIGHT = 4350;
 
 // Rendered once per region id, used by both the canvas Frame layout and the
 // stacked skip-link fallback — same component, not a second copy to
