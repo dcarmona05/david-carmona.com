@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import VideoDemo from '@/components/VideoDemo';
@@ -16,12 +17,50 @@ function Tag({ color, children }) {
   return <span className={`text-[10px] font-mono uppercase tracking-wide ${colorClass}`}>{children}</span>;
 }
 
-function FlowStep({ who, color, title, children }) {
+const LANES = [
+  { key: 'customer', label: 'Customer', dot: 'bg-accent2' },
+  { key: 'banker', label: 'Banker', dot: 'bg-white' },
+  { key: 'otto', label: 'Otto', dot: 'bg-accent3' },
+];
+
+const CALL_STEPS = [
+  { lane: 'customer', title: 'Stop payment' },
+  { lane: 'otto', title: 'Intent' },
+  { lane: 'banker', title: 'Greet & verify' },
+  { lane: 'otto', title: 'Identity' },
+  { lane: 'banker', title: 'Check details' },
+  { lane: 'customer', title: '"My paycheck?"' },
+  { lane: 'otto', title: 'Recommended action' },
+  { lane: 'banker', title: 'Answer deposit' },
+];
+
+function Swimlane() {
+  const gridCols = `76px repeat(${CALL_STEPS.length}, minmax(96px, 1fr))`;
   return (
-    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-4 min-w-[180px] shrink-0">
-      <Tag color={color}>{who}</Tag>
-      <p className="mt-1.5 font-display text-white">{title}</p>
-      <p className="mt-1 text-sm text-white/50 leading-snug">{children}</p>
+    <div className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="grid gap-x-2 gap-y-3 min-w-[860px]" style={{ gridTemplateColumns: gridCols }}>
+        {LANES.map((lane) => (
+          <Fragment key={lane.key}>
+            <div className="flex items-center gap-2 py-3">
+              <span className={`w-2 h-2 rounded-full ${lane.dot} shrink-0`} />
+              <span className="text-[10px] font-mono uppercase tracking-wide text-white/50">{lane.label}</span>
+            </div>
+            {CALL_STEPS.map((step, i) => (
+              <div key={`${lane.key}-${i}`} className="border-t border-white/10 py-3 flex items-center">
+                {step.lane === lane.key && (
+                  <div
+                    className={`w-full rounded-md border px-2.5 py-2 ${
+                      lane.key === 'otto' ? 'border-accent3/30 bg-accent3/5' : 'border-white/10 bg-white/[0.03]'
+                    }`}
+                  >
+                    <p className="text-xs font-display text-white leading-snug">{step.title}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 }
@@ -126,6 +165,15 @@ export default function OttoCaseStudyPage() {
           <div>
             <h2 className="font-display text-xl text-white">What It Is</h2>
             <p className="mt-3 text-white/70 leading-relaxed">{item.overview}</p>
+            <div className="mt-6 rounded-lg border border-white/10 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/work/otto-contact-center/details-captured.png"
+                alt="Otto filling in stop-payment details live on the call, with a delayed-deposit alert in Customer 360"
+                className="w-full h-auto"
+                loading="lazy"
+              />
+            </div>
           </div>
           <ul className="space-y-3 text-sm">
             {[
@@ -183,31 +231,8 @@ export default function OttoCaseStudyPage() {
             Customer, Otto, and the banker are all moving at the same time &mdash; and the customer
             doesn&apos;t follow a script.
           </p>
-          <div className="mt-6 flex gap-3 overflow-x-auto pb-2">
-            <FlowStep who="Customer" color="lime" title="Stop payment">
-              Daniel calls about a check that never arrived.
-            </FlowStep>
-            <FlowStep who="Otto" color="cyan" title="Intent">
-              Recognizes a stop-payment request.
-            </FlowStep>
-            <FlowStep who="Banker" color="neutral" title="Greet & verify">
-              Welcomes him and asks him to verify.
-            </FlowStep>
-            <FlowStep who="Otto" color="cyan" title="Identity">
-              Confirms who he is from what he says.
-            </FlowStep>
-            <FlowStep who="Banker" color="neutral" title="Check details">
-              Gathers the amount, date, and check number.
-            </FlowStep>
-            <FlowStep who="Customer" color="lime" title={'"Also… my paycheck?"'}>
-              An off-script question, mid-task.
-            </FlowStep>
-            <FlowStep who="Otto" color="cyan" title="Recommended action">
-              Surfaces the deposit answer without taking over.
-            </FlowStep>
-            <FlowStep who="Banker" color="neutral" title="Answer deposit">
-              Resolves the side question, then returns to the task.
-            </FlowStep>
+          <div className="mt-6">
+            <Swimlane />
           </div>
           <p className="mt-3 text-sm text-white/40 italic">
             Customers don&apos;t follow a script. Success depends on how well Otto reacts.

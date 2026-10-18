@@ -6,8 +6,20 @@ export default function CaseStudyCard({ item }) {
       href={`/work/${item.slug}`}
       className="group block rounded-lg border border-white/10 overflow-hidden hover:border-white/30 hover:-translate-y-1 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      <div className={`aspect-[4/3] bg-gradient-to-br ${item.accent} flex items-end p-4`}>
-        <span className="text-white/80 text-xs uppercase tracking-wide">
+      <div className={`relative aspect-[4/3] overflow-hidden flex items-end p-4 ${item.heroImage ? 'bg-black' : `bg-gradient-to-br ${item.accent}`}`}>
+        {item.heroImage && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={item.heroImage}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+          />
+        )}
+        {item.heroImage && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+        )}
+        <span className="relative text-white/80 text-xs uppercase tracking-wide">
           {item.company} &middot; {item.category}
         </span>
       </div>
