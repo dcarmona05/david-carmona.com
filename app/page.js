@@ -235,7 +235,7 @@ export default function HomePage() {
         ref={stageRef}
         initialRegionId="home"
         onActiveRegionChange={setActiveRegion}
-        className="h-[calc(100vh-4rem)] min-h-[480px]"
+        className="h-full min-h-[480px]"
         panningDisabled={activeTool !== 'move'}
         onCanvasPointerDown={(world, e) => collabRef.current?.handlePointerDown(world, e)}
         onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
