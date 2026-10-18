@@ -1,0 +1,86 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "canvas": {
+      "elements": {
+        ".read": "auth != null",
+        "$elementId": {
+          ".write": "auth != null && (!data.exists() || data.child('authorUid').val() === auth.uid || auth.uid === 'REPLACE_WITH_OWNER_UID')",
+          ".validate": "newData.hasChildren(['type', 'authorUid', 'authorNickname', 'createdAt']) || !newData.exists()",
+          "type": { ".validate": "newData.val() === 'frame' || newData.val() === 'text' || newData.val() === 'pen' || newData.val() === 'sticker'" },
+          "authorUid": { ".validate": "newData.val() === auth.uid" },
+          "authorNickname": { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "createdAt": { ".validate": "newData.val() === now" },
+          "x": { ".validate": "newData.isNumber()" },
+          "y": { ".validate": "newData.isNumber()" },
+          "width": { ".validate": "newData.isNumber()" },
+          "height": { ".validate": "newData.isNumber()" },
+          "color": { ".validate": "newData.isString() && newData.val().length <= 10" },
+          "text": { ".validate": "newData.isString() && newData.val().length <= 140" },
+          "stickerId": { ".validate": "newData.isString() && newData.val().length <= 8" },
+          "points": {
+            ".validate": "newData.hasChildren() && newData.numChildren() <= 200",
+            "$index": {
+              ".validate": "newData.hasChildren() && newData.numChildren() === 2",
+              "$coord": { ".validate": "newData.isNumber()" }
+            }
+          },
+          "$other": { ".validate": false }
+        }
+      },
+
+      "comments": {
+        ".read": "auth != null",
+        "$commentId": {
+          ".write": "auth != null && (!data.exists() || data.child('authorUid').val() === auth.uid || auth.uid === 'REPLACE_WITH_OWNER_UID')",
+          ".validate": "newData.hasChildren(['regionId', 'text', 'authorUid', 'authorNickname', 'createdAt']) || !newData.exists()",
+          "regionId": { ".validate": "newData.val() === 'home' || newData.val() === 'about' || newData.val() === 'work' || newData.val() === 'contact'" },
+          "text": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 280" },
+          "authorUid": { ".validate": "newData.val() === auth.uid" },
+          "authorNickname": { ".validate": "newData.isString() && newData.val().length <= 40" },
+          "createdAt": { ".validate": "newData.val() === now" },
+          "$other": { ".validate": false }
+        }
+      },
+
+      "moderation": {
+        "flags": {
+          ".read": "auth != null",
+          "$itemId": {
+            "$flaggerUid": {
+              ".write": "auth != null && auth.uid === $flaggerUid",
+              ".validate": "newData.val() === true"
+            }
+          }
+        }
+      }
+    },
+
+    "presence": {
+      ".read": "auth != null",
+      "$clientId": {
+        ".write": "auth != null && auth.uid === $clientId",
+        ".validate": "newData.hasChildren(['nickname', 'color', 'connectedAt', 'lastActive'])",
+        "nickname": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "color": { ".validate": "newData.isString() && newData.val().length <= 10" },
+        "cursor": {
+          "x": { ".validate": "newData.isNumber()" },
+          "y": { ".validate": "newData.isNumber()" }
+        },
+        "connectedAt": { ".validate": "newData.isNumber()" },
+        "lastActive": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "stats": {
+      "totalVisits": {
+        ".read": true,
+        ".write": "auth != null",
+        ".validate": "newData.isNumber()"
+      }
+    }
+  }
+}

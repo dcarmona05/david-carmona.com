@@ -4,6 +4,9 @@ import { useCallback, useRef, useState } from 'react';
 import Link from 'next/link';
 import CanvasStage from '@/components/canvas/CanvasStage';
 import CanvasNav from '@/components/canvas/CanvasNav';
+import CollabToolbar from '@/components/canvas/CollabToolbar';
+import CollabLayer from '@/components/canvas/CollabLayer';
+import CommentsPanel from '@/components/canvas/CommentsPanel';
 import Frame from '@/components/canvas/Frame';
 import CaseStudyCard from '@/components/CaseStudyCard';
 import ContactForm from '@/components/ContactForm';
@@ -112,12 +115,25 @@ function RegionContent({ id }) {
 
 export default function HomePage() {
   const stageRef = useRef(null);
+  const collabRef = useRef(null);
   const [mode, setMode] = useState('canvas');
   const [activeRegion, setActiveRegion] = useState('home');
+
+  // Phase 3.5 — collaborative toolbar state.
+  const [activeTool, setActiveTool] = useState('move');
+  const [pendingSticker, setPendingSticker] = useState(null);
+  const [isLive, setIsLive] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
 
   const panTo = useCallback((id) => {
     setActiveRegion(id);
     stageRef.current?.panToRegion(id);
+  }, []);
+
+  const selectTool = useCallback((tool) => {
+    setActiveTool((current) => (current === tool ? 'move' : tool));
+    setPendingSticker(null);
   }, []);
 
   if (mode === 'simple') {
@@ -158,6 +174,10 @@ export default function HomePage() {
         initialRegionId="home"
         onActiveRegionChange={setActiveRegion}
         className="h-[calc(100vh-4rem)] min-h-[480px]"
+        panningDisabled={activeTool !== 'move'}
+        onCanvasPointerDown={(world, e) => collabRef.current?.handlePointerDown(world, e)}
+        onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
+        onCanvasPointerUp={(world, e) => collabRef.current?.handlePointerUp(world, e)}
       >
         <div className="relative" style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT }}>
           {REGIONS.map((region) => (
@@ -172,10 +192,35 @@ export default function HomePage() {
               <RegionContent id={region.id} />
             </Frame>
           ))}
+          <CollabLayer
+            ref={collabRef}
+            activeTool={activeTool}
+            pendingSticker={pendingSticker}
+            onStickerPlaced={() => setPendingSticker(null)}
+            onLiveStatusChange={setIsLive}
+          />
         </div>
       </CanvasStage>
 
       <CanvasNav regions={REGIONS} active={activeRegion} onNavigate={panTo} />
+
+      <CollabToolbar
+        activeTool={activeTool}
+        onSelectTool={selectTool}
+        isLive={isLive}
+        commentCount={commentCount}
+        commentsOpen={commentsOpen}
+        onToggleComments={() => setCommentsOpen((v) => !v)}
+        stickerPickerOpen={activeTool === 'sticker'}
+        onSelectSticker={setPendingSticker}
+      />
+
+      <CommentsPanel
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        activeRegion={activeRegion}
+        onCountChange={setCommentCount}
+      />
     </>
   );
 }

@@ -17,7 +17,16 @@ const FOCUSABLE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
  * camera without this component needing to know about regions/labels itself.
  */
 const CanvasStage = forwardRef(function CanvasStage(
-  { children, initialRegionId, onActiveRegionChange, className = '' },
+  {
+    children,
+    initialRegionId,
+    onActiveRegionChange,
+    className = '',
+    panningDisabled = false,
+    onCanvasPointerDown,
+    onCanvasPointerMove,
+    onCanvasPointerUp,
+  },
   ref
 ) {
   const innerRef = useRef(null);
@@ -35,7 +44,24 @@ const CanvasStage = forwardRef(function CanvasStage(
     [reducedMotion]
   );
 
-  useImperativeHandle(ref, () => ({ panToRegion }), [panToRegion]);
+  // Converts a pointer event's screen coordinates into world-space canvas
+  // coordinates (i.e. the same coordinate space Frame's x/y props use) —
+  // needed by the Phase 3.5 collaborative tools (frame/text/pen/sticker
+  // placement) to know where on the canvas a click/drag actually landed,
+  // accounting for the live pan position and zoom scale.
+  const screenToWorld = useCallback((clientX, clientY) => {
+    const content = innerRef.current;
+    const wrapperEl = content?.instance?.wrapperComponent;
+    if (!content || !wrapperEl) return null;
+    const { positionX, positionY, scale } = content.instance.transformState;
+    const wrapperRect = wrapperEl.getBoundingClientRect();
+    return {
+      x: (clientX - wrapperRect.left - positionX) / scale,
+      y: (clientY - wrapperRect.top - positionY) / scale,
+    };
+  }, []);
+
+  useImperativeHandle(ref, () => ({ panToRegion, screenToWorld }), [panToRegion, screenToWorld]);
 
   // Snap to the initial region once on mount, instantly — no animated jump
   // the moment the page loads.
@@ -115,10 +141,28 @@ const CanvasStage = forwardRef(function CanvasStage(
     return () => node?.removeEventListener('focusin', onFocusIn);
   }, [onActiveRegionChange, panToRegion]);
 
+  // While a Phase 3.5 create-tool (frame/text/pen/sticker) is active, the
+  // library's own panning is disabled (see the `panning`/`pinch` props
+  // below) and pointer events on the wrapper instead drive drawing —
+  // translated into the same world-space coordinates Frame's x/y use.
+  const handlePointerEvent = useCallback(
+    (handler) => (event) => {
+      if (!panningDisabled || !handler) return;
+      const world = screenToWorld(event.clientX, event.clientY);
+      if (world) handler(world, event);
+    },
+    [panningDisabled, screenToWorld]
+  );
+
   return (
     <div
       ref={wrapperRef}
-      className={`canvas-dot-grid relative w-full overflow-hidden ${className}`}
+      onPointerDown={handlePointerEvent(onCanvasPointerDown)}
+      onPointerMove={handlePointerEvent(onCanvasPointerMove)}
+      onPointerUp={handlePointerEvent(onCanvasPointerUp)}
+      className={`canvas-dot-grid relative w-full overflow-hidden ${className} ${
+        panningDisabled ? 'cursor-crosshair' : ''
+      }`}
     >
       <TransformWrapper
         ref={innerRef}
@@ -129,6 +173,8 @@ const CanvasStage = forwardRef(function CanvasStage(
         limitToBounds={false}
         wheel={{ step: 0.2 }}
         doubleClick={{ disabled: true }}
+        panning={{ disabled: panningDisabled }}
+        pinch={{ disabled: panningDisabled }}
       >
         <TransformComponent
           wrapperStyle={{ width: '100%', height: '100%' }}
