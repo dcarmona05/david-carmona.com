@@ -41,6 +41,18 @@ import { startPresence, subscribeVisitCount, countVisitOnce } from '@/lib/presen
 const REGION_WIDTH = 700;
 const WORLD_WIDTH = REGION_WIDTH + 200;
 const REGION_GAP = 112;
+// How much empty world-space sits above Home, before anything else. This
+// isn't just cosmetic breathing room — CanvasStage's `panToRegion` wants to
+// land Home's top `TOP_MARGIN` (96) screen-px below CanvasNav, but Home is
+// the very first thing in the world div, so `limitToBounds` won't let the
+// camera reveal more empty space above it than this padding actually
+// provides (there's nothing beyond it to reveal). Real bug found: at the
+// old 60px padding, that cap landed Home's top flush against (sometimes
+// slightly behind) CanvasNav — confirmed by measuring both elements'
+// real screen rects, not guessing. 180 clears it with real margin even at
+// the lowest realistic zoom (~0.55x on a narrow phone; TOP_MARGIN / 0.55 ≈
+// 175).
+const TOP_PADDING = 180;
 const REGIONS = [
   { id: 'home', label: 'Home', width: REGION_WIDTH },
   { id: 'work', label: 'Work', width: REGION_WIDTH },
@@ -244,7 +256,7 @@ export default function HomePage() {
       >
         <div
           className="relative flex flex-col items-center"
-          style={{ width: WORLD_WIDTH, gap: REGION_GAP, paddingTop: 60, paddingBottom: 60 }}
+          style={{ width: WORLD_WIDTH, gap: REGION_GAP, paddingTop: TOP_PADDING, paddingBottom: 60 }}
         >
           {REGIONS.map((region) => (
             <Frame key={region.id} id={region.id} title={region.label} width={region.width}>

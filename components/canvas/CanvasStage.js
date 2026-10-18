@@ -8,7 +8,11 @@ const PAN_STEP = 140;
 const FOCUSABLE_TAGS = new Set(['INPUT', 'TEXTAREA', 'SELECT']);
 const MIN_FIT_SCALE = 0.4;
 const MAX_FIT_SCALE = 1.15;
-const TOP_MARGIN = 96; // clears CanvasNav, docked at top-20
+// Clears CanvasNav (docked at top-20). For the very first region (Home),
+// this only works if there's real empty world-space above it for
+// `limitToBounds` to let the camera reveal — see app/page.js's
+// `TOP_PADDING` constant for why.
+const TOP_MARGIN = 96;
 
 // Mirrors react-zoom-pan-pinch's own internal getOffset() exactly (same
 // formula, read from its source) — needed because our own pan target below
@@ -113,11 +117,23 @@ const CanvasStage = forwardRef(function CanvasStage(
   useImperativeHandle(ref, () => ({ panToRegion, screenToWorld }), [panToRegion, screenToWorld]);
 
   // Snap to the initial region once on mount, instantly — no animated jump
-  // the moment the page loads.
+  // the moment the page loads. Uses a double requestAnimationFrame rather
+  // than `setTimeout(fn, 0)` — the standard idiom for "wait until a real
+  // layout+paint has happened," which a bare setTimeout doesn't actually
+  // guarantee (it only waits for the next macrotask, not for layout).
+  // Stricter than what turned out to be needed to fix the actual bug below
+  // (see TOP_PADDING in app/page.js), but a real correctness improvement
+  // in its own right, so keeping it.
   useEffect(() => {
     if (!initialRegionId) return undefined;
-    const timer = setTimeout(() => panToRegion(initialRegionId, { instant: true }), 0);
-    return () => clearTimeout(timer);
+    let raf2 = null;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => panToRegion(initialRegionId, { instant: true }));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
     // Intentionally run once on mount only.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
