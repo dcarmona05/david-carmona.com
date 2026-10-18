@@ -7,6 +7,7 @@ import FocusAreas from '@/components/FocusAreas';
 import AudienceArchetypes from '@/components/AudienceArchetypes';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import VideoDemo from '@/components/VideoDemo';
+import VideoGallery from '@/components/VideoGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
 
@@ -101,7 +102,7 @@ export default function CaseStudyPage({ params }) {
         <section className="mt-16">
           <h2 className="font-display text-xl text-white">Watch It In Action</h2>
           <div className="mt-6 max-w-3xl">
-            <VideoDemo videoUrl={item.videoUrl} />
+            {item.videos ? <VideoGallery videos={item.videos} /> : <VideoDemo videoUrl={item.videoUrl} />}
           </div>
         </section>
       </Reveal>
