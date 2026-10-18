@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
+import HeroVideo from '@/components/HeroVideo';
 import VideoDemo from '@/components/VideoDemo';
 import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
@@ -86,14 +87,8 @@ export default function OttoCaseStudyPage() {
         </Link>
 
         <div className="relative mt-6 aspect-[16/8] rounded-lg overflow-hidden bg-black">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={item.heroImage}
-            alt=""
-            aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover object-top"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
+          <HeroVideo src={item.videoUrl} poster={item.heroImage} />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10 pointer-events-none" />
 
           <span className="absolute top-4 left-4 text-xs uppercase tracking-wide text-white/80 bg-black/30 rounded-full px-3 py-1">
             {item.company} &middot; {item.category}
@@ -144,10 +139,10 @@ export default function OttoCaseStudyPage() {
               alt="Samantha Lee, the banker persona"
               className="w-28 h-28 rounded-full object-cover shrink-0 bg-white/5"
             />
-            <div>
+            <div className="flex-1">
               <p className="font-display text-lg text-white">Samantha Lee</p>
               <p className="text-sm text-white/50">Banker, Alectri Bank</p>
-              <p className="mt-3 text-white/70 leading-relaxed max-w-xl">
+              <p className="mt-3 text-white/70 leading-relaxed">
                 A contact-center banker who takes live customer calls all day. Mid-call, she has to
                 listen to the customer, verify who they are, pull up account history, follow
                 compliance steps like step-up authentication, and write up what happened &mdash; while
@@ -244,7 +239,7 @@ export default function OttoCaseStudyPage() {
       <Reveal delay={0.1}>
         <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
           <h3 className="font-display text-lg text-white">The Same Call, Without Otto</h3>
-          <p className="mt-3 text-white/70 leading-relaxed max-w-2xl">
+          <p className="mt-3 text-white/70 leading-relaxed">
             Walking the same scenario without Otto takes more screens and more holds: the banker
             switches between a profile, accounts, check search, deposits, and a policy doc by hand,
             putting the customer on hold twice along the way. With Otto, the call wraps in roughly
@@ -352,7 +347,7 @@ export default function OttoCaseStudyPage() {
       <Reveal delay={0.14}>
         <section className="mt-16 rounded-lg border border-white/10 p-6 sm:p-8">
           <h2 className="font-display text-xl text-white">Where It Lives, and Why</h2>
-          <p className="mt-3 text-white/70 leading-relaxed max-w-2xl">
+          <p className="mt-3 text-white/70 leading-relaxed">
             Otto for Contact Center is a desktop experience, not a mobile one. A banker on a live call
             needs the transcript, the call script, and the Customer 360 view open at once on a wide
             screen, with a free hand on the keyboard while the other holds the conversation &mdash; a
