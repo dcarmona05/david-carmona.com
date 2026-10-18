@@ -3,25 +3,25 @@ const PHASES = [
     label: 'Discover',
     description: 'Audit existing patterns, talk to stakeholders, and map the problem space.',
     aiNote: 'AI helps synthesize research and surface patterns across large amounts of feedback faster.',
-    color: '#FF3D81',
+    color: 'rgb(var(--color-accent))',
   },
   {
     label: 'Iterate',
     description: 'Explore multiple directions in parallel and test assumptions early.',
     aiNote: 'AI-generated variations widen the exploration space before committing to a direction.',
-    color: '#D9FF3D',
+    color: 'rgb(var(--color-accent2))',
   },
   {
     label: 'Prototype',
     description: 'Build interactive prototypes to validate flows before engineering investment.',
     aiNote: 'AI-assisted tooling speeds up prototyping, from layout generation to interaction logic.',
-    color: '#3DDBFF',
+    color: 'rgb(var(--color-accent3))',
   },
   {
     label: 'Develop',
     description: 'Partner with engineering to ship, document, and drive adoption.',
     aiNote: 'AI assists with documentation and consistency checks as the work ships.',
-    color: '#FF3D81',
+    color: 'rgb(var(--color-accent))',
   },
 ];
 

@@ -2,7 +2,7 @@ const LOOPS = [
   {
     initialD: 'M335.0,190.0 L329.5,231.4 L313.6,270.0 L288.1,303.1 L255.0,328.6 L216.4,344.5 L175.0,350.0 L133.6,344.5 L95.0,328.6 L61.9,303.1 L36.4,270.0 L20.5,231.4 L15.0,190.0 L20.5,148.6 L36.4,110.0 L61.9,76.9 L95.0,51.4 L133.6,35.5 L175.0,30.0 L216.4,35.5 L255.0,51.4 L288.1,76.9 L313.6,110.0 L329.5,148.6 Z',
     morphName: 'doodle-morph-0',
-    color: '#FF3D81',
+    colorClass: 'stroke-accent',
     opacity: 0.8,
     strokeWidth: 2.5,
     dash: null,
@@ -14,7 +14,7 @@ const LOOPS = [
   {
     initialD: 'M335.0,207.0 L330.6,240.6 L317.6,272.0 L296.9,298.9 L270.0,319.6 L238.6,332.6 L205.0,337.0 L171.4,332.6 L140.0,319.6 L113.1,298.9 L92.4,272.0 L79.4,240.6 L75.0,207.0 L79.4,173.4 L92.4,142.0 L113.1,115.1 L140.0,94.4 L171.4,81.4 L205.0,77.0 L238.6,81.4 L270.0,94.4 L296.9,115.1 L317.6,142.0 L330.6,173.4 Z',
     morphName: 'doodle-morph-1',
-    color: '#D9FF3D',
+    colorClass: 'stroke-accent2',
     opacity: 0.6,
     strokeWidth: 1.5,
     dash: '7 6',
@@ -26,7 +26,7 @@ const LOOPS = [
   {
     initialD: 'M307.0,172.0 L303.1,201.8 L291.6,229.5 L273.3,253.3 L249.5,271.6 L221.8,283.1 L192.0,287.0 L162.2,283.1 L134.5,271.6 L110.7,253.3 L92.4,229.5 L80.9,201.8 L77.0,172.0 L80.9,142.2 L92.4,114.5 L110.7,90.7 L134.5,72.4 L162.2,60.9 L192.0,57.0 L221.8,60.9 L249.5,72.4 L273.3,90.7 L291.6,114.5 L303.1,142.2 Z',
     morphName: 'doodle-morph-2',
-    color: '#3DDBFF',
+    colorClass: 'stroke-accent3',
     opacity: 0.55,
     strokeWidth: 2,
     dash: '1 6',
@@ -75,10 +75,9 @@ export default function HeroDoodle() {
         {LOOPS.map((loop, i) => (
           <path
             key={i}
-            className="doodle-loop"
+            className={`doodle-loop ${loop.colorClass}`}
             d={loop.initialD}
             fill="none"
-            stroke={loop.color}
             strokeWidth={loop.strokeWidth}
             strokeDasharray={loop.dash || undefined}
             strokeLinecap={loop.dash ? 'round' : undefined}

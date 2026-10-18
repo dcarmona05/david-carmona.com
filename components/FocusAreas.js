@@ -1,4 +1,5 @@
-const PALETTE = ['#FF3D81', '#D9FF3D', '#3DDBFF'];
+// Regular (AA-aware) accent tokens — this dot sits directly on the page background.
+const PALETTE = ['rgb(var(--color-accent))', 'rgb(var(--color-accent2))', 'rgb(var(--color-accent3))'];
 
 const FOCUS_BY_CATEGORY = {
   'Design Systems': {

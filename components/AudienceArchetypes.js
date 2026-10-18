@@ -1,4 +1,5 @@
-const PALETTE = ['#FF3D81', '#D9FF3D', '#3DDBFF'];
+// Regular (AA-aware) accent tokens — this badge sits directly on the page background.
+const PALETTE = ['rgb(var(--color-accent))', 'rgb(var(--color-accent2))', 'rgb(var(--color-accent3))'];
 
 const ARCHETYPES_BY_CATEGORY = {
   'Design Systems': [
@@ -37,7 +38,7 @@ export default function AudienceArchetypes({ category }) {
       {archetypes.map((person, i) => (
         <div key={person.role} className="rounded-lg border border-border/10 p-5">
           <span
-            className="inline-flex w-8 h-8 rounded-full items-center justify-center text-xs font-display font-medium text-black"
+            className="inline-flex w-8 h-8 rounded-full items-center justify-center text-xs font-display font-medium text-accent-ink"
             style={{ backgroundColor: PALETTE[i % 3] }}
           >
             {person.role.charAt(0)}
