@@ -5,6 +5,7 @@ import AbstractVisual from '@/components/AbstractVisual';
 import ProcessSteps from '@/components/ProcessSteps';
 import FocusAreas from '@/components/FocusAreas';
 import AudienceArchetypes from '@/components/AudienceArchetypes';
+import ScreenshotGallery from '@/components/ScreenshotGallery';
 import VideoDemo from '@/components/VideoDemo';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
 import { work, getWorkBySlug, getNextWork } from '@/lib/work';
@@ -87,6 +88,20 @@ export default function CaseStudyPage({ params }) {
               <p className="mt-3 text-white/70 leading-relaxed">{item.overview}</p>
             </div>
             <AbstractVisual category={item.category} />
+          </section>
+        </Reveal>
+      )}
+
+      {item.screenshots && (
+        <Reveal delay={0.075}>
+          <section className="mt-16">
+            <h2 className="font-display text-xl text-white">Product Walkthrough</h2>
+            <p className="mt-2 text-sm text-white/40 max-w-2xl">
+              Real screens from the working prototype.
+            </p>
+            <div className="mt-6">
+              <ScreenshotGallery screenshots={item.screenshots} />
+            </div>
           </section>
         </Reveal>
       )}
