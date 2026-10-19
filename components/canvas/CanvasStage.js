@@ -44,6 +44,7 @@ const CanvasStage = forwardRef(function CanvasStage(
     initialRegionId,
     onActiveRegionChange,
     className = '',
+    style,
     panningDisabled = false,
     onCanvasPointerDown,
     onCanvasPointerMove,
@@ -282,6 +283,7 @@ const CanvasStage = forwardRef(function CanvasStage(
   return (
     <div
       ref={wrapperRef}
+      style={style}
       onPointerDown={handlePointerEvent(onCanvasPointerDown)}
       onPointerMove={(event) => {
         handlePointerEvent(onCanvasPointerMove)(event);
@@ -300,9 +302,7 @@ const CanvasStage = forwardRef(function CanvasStage(
         centerOnInit={false}
         // Keeps user-driven pan (drag/wheel/pinch) within the designed
         // content area instead of letting it wander into empty space
-        // forever — our own programmatic panToRegion above uses
-        // setTransform directly, which this does NOT constrain, so jumping
-        // between regions is unaffected.
+        // forever.
         limitToBounds
         onTransformed={handleTransformed}
         // wheelDisabled + wheelPanning (below) is the Figma convention:

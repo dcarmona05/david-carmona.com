@@ -60,7 +60,18 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <MotionConfig reducedMotion="user">
             <Header />
-            <main className="flex-1 w-full">
+            {/* min-h-0 overrides a flex item's default min-height:auto --
+                without it, a flex item won't shrink below its content's
+                natural size even with flex-1, so the canvas's own content
+                height (thousands of px) was stretching <main> to match
+                instead of <main> capping the canvas to the viewport. Real
+                bug: traced directly to the h-full change that fixed the
+                black-gap-before-footer bug earlier this session -- that
+                fix needed a definite height to resolve against, and
+                without min-h-0 here, "definite" silently became
+                "content-sized" instead of "viewport-sized," collapsing
+                the canvas's own pannable range to almost nothing. */}
+            <main className="flex-1 min-h-0 w-full">
               {children}
             </main>
             <Footer />

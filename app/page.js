@@ -151,6 +151,26 @@ export default function HomePage() {
   const collabRef = useRef(null);
   const [mode, setMode] = useState('canvas');
   const [activeRegion, setActiveRegion] = useState('home');
+  // Real bug found and fixed: the canvas wrapper being `h-full` (percent of
+  // <main>, a flex item) rather than a definite pixel height left
+  // react-zoom-pan-pinch's own wrapper measuring 100% against an
+  // ambiguous/content-driven height instead of the viewport -- its
+  // pannable range collapsed to almost nothing, making Work/Contact
+  // unreachable by scrolling regardless of zoom or `limitToBounds`.
+  // Measuring the real available space directly (viewport height minus
+  // wherever the header actually ends) and setting it as an explicit px
+  // height sidesteps the whole percentage/flexbox ambiguity.
+  const [canvasHeight, setCanvasHeight] = useState(null);
+  useEffect(() => {
+    function measure() {
+      const header = document.querySelector('header');
+      const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+      setCanvasHeight(Math.max(window.innerHeight - headerBottom, 480));
+    }
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
 
   // Phase 3.5 — collaborative toolbar state.
   const [activeTool, setActiveTool] = useState('move');
@@ -275,7 +295,8 @@ export default function HomePage() {
         ref={stageRef}
         initialRegionId="home"
         onActiveRegionChange={setActiveRegion}
-        className="h-full min-h-[480px]"
+        className="min-h-[480px]"
+        style={canvasHeight ? { height: canvasHeight } : undefined}
         panningDisabled={activeTool !== 'move'}
         onCanvasPointerDown={(world, e) => collabRef.current?.handlePointerDown(world, e)}
         onCanvasPointerMove={(world, e) => collabRef.current?.handlePointerMove(world, e)}
