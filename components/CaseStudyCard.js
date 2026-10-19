@@ -48,6 +48,20 @@ export default function CaseStudyCard({ item, viewCount, isMostViewed }) {
           </span>
         )}
 
+        {/* Every /work/[slug] case study sits behind the same password
+            gate (middleware.js's matcher covers all of /work/:path*) --
+            this hints that before the click, not as a per-item flag. */}
+        <span
+          title="Password protected"
+          aria-label="Password protected"
+          className="absolute bottom-3 right-3 flex items-center justify-center w-7 h-7 rounded-full bg-black/60 backdrop-blur-sm text-white/90"
+        >
+          <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2">
+            <rect x="5" y="11" width="14" height="9" rx="2" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+          </svg>
+        </span>
+
         <span className="relative text-white/80 text-xs uppercase tracking-wide">
           {item.company} &middot; {item.category}
         </span>
