@@ -8,6 +8,7 @@ import {
   deleteElement,
   togglePin,
   countPins,
+  isElementExpired,
   loadLocalElements,
   saveLocalElements,
   MAX_PEN_POINTS,
@@ -357,12 +358,24 @@ const CollabLayer = forwardRef(function CollabLayer(
   // place — a single malformed write (a 'pen' with no points, a type the
   // client doesn't know) would otherwise crash this render for every
   // visitor, not just whoever wrote it.
-  const entries = Object.entries(merged).filter(([, el]) => {
-    if (el.type === 'pen') return Array.isArray(el.points) && el.points.length >= 2;
-    if (el.type === 'frame') return typeof el.x === 'number' && typeof el.y === 'number';
-    if (el.type === 'text') return typeof el.x === 'number' && typeof el.y === 'number' && typeof el.text === 'string';
-    if (el.type === 'sticker') return typeof el.x === 'number' && typeof el.y === 'number' && typeof el.stickerId === 'string';
-    return false;
+  const entries = Object.entries(merged).filter(([id, el]) => {
+    if (el.type === 'pen') {
+      if (!Array.isArray(el.points) || el.points.length < 2) return false;
+    } else if (el.type === 'frame') {
+      if (typeof el.x !== 'number' || typeof el.y !== 'number') return false;
+    } else if (el.type === 'text') {
+      if (typeof el.x !== 'number' || typeof el.y !== 'number' || typeof el.text !== 'string') return false;
+    } else if (el.type === 'sticker') {
+      if (typeof el.x !== 'number' || typeof el.y !== 'number' || typeof el.stickerId !== 'string') return false;
+    } else {
+      return false;
+    }
+    // Daily clear: an element older than a day hides itself unless pinned
+    // (lib/canvasSync.js's isElementExpired) -- comments are a separate
+    // tree/component and untouched by this.
+    const isPinnedByMe = localPinIds.has(id) || !!(myUid && pins[id]?.[myUid]);
+    const isPinned = isPinnedByMe || countPins(pins, id) > 0;
+    return !isElementExpired(el, isPinned);
   });
 
   return (
