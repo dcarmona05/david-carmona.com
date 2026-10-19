@@ -21,9 +21,9 @@
           "text": { ".validate": "newData.isString() && newData.val().length <= 140" },
           "stickerId": { ".validate": "newData.isString() && newData.val().length <= 8" },
           "points": {
-            ".validate": "newData.hasChildren() && newData.numChildren() <= 200",
+            ".validate": "newData.hasChildren()",
             "$index": {
-              ".validate": "newData.hasChildren() && newData.numChildren() === 2",
+              ".validate": "newData.hasChildren(['0', '1'])",
               "$coord": { ".validate": "newData.isNumber()" }
             }
           },
