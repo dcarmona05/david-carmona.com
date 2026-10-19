@@ -103,7 +103,11 @@ function ChatInput({ input, setInput, onSubmit, loading }) {
 // Pops up on its own after a short delay instead of sitting there the
 // instant the page loads — David asked for it to feel like it arrives
 // rather than being part of the initial furniture.
-const INITIAL_POPUP_DELAY_MS = 12000;
+const INITIAL_POPUP_DELAY_MS = 3000;
+
+// The "online" dot reuses the identity palette's mint green (lib/identity.js)
+// rather than inventing a new semantic color just for this one badge.
+const PRESENCE_GREEN = '#3DFFA8';
 
 export default function AgentChat() {
   const [view, setView] = useState('hidden');
@@ -180,10 +184,31 @@ export default function AgentChat() {
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
             onClick={() => setView('docked')}
-            className="flex items-center gap-2 bg-accent text-accent-ink font-medium pl-4 pr-5 py-3 rounded-full shadow-lg hover:scale-[1.03] transition-transform"
+            className="flex items-center gap-2.5 bg-accent text-accent-ink font-medium pl-2 pr-5 py-2 rounded-full shadow-lg hover:scale-[1.03] transition-transform"
           >
-            <span className="w-2 h-2 rounded-full bg-accent-ink/70" />
-            Ask me anything
+            {/* David's own photo, like it's really him asking -- with an
+                always-on presence dot (a status badge, not the old plain
+                decorative dot) so the bubble reads as "live," not static
+                furniture. */}
+            <span className="relative shrink-0 w-9 h-9">
+              <img
+                src="/profile.jpg"
+                alt=""
+                aria-hidden="true"
+                className="w-9 h-9 rounded-full object-cover"
+              />
+              <span className="absolute bottom-0 right-0 w-3 h-3">
+                <span
+                  className="absolute inline-flex w-full h-full rounded-full opacity-60 animate-ping"
+                  style={{ backgroundColor: PRESENCE_GREEN }}
+                />
+                <span
+                  className="relative inline-flex w-3 h-3 rounded-full border-2 border-accent"
+                  style={{ backgroundColor: PRESENCE_GREEN }}
+                />
+              </span>
+            </span>
+            <span className="italic">&ldquo;Ask me anything&rdquo;</span>
           </motion.button>
         )}
 
