@@ -396,16 +396,44 @@ const CollabLayer = forwardRef(function CollabLayer(
           const minY = Math.min(...ys) - 10;
           const w = Math.max(...xs) - minX + 20;
           const h = Math.max(...ys) - minY + 20;
+          const strokePath = pointsToPath(el.points.map(([x, y]) => [x - minX, y - minY]));
           return (
-            <div key={id} className="group absolute" style={{ left: minX, top: minY, width: w, height: h }}>
-              <svg width={w} height={h} className="overflow-visible pointer-events-none">
+            // Real bug David found: this wrapper had no pointer-events
+            // setting, so its default "auto" made the drawing's whole
+            // bounding box (often much larger than the actual ink, since a
+            // loose scribble's rectangle spans everything between its
+            // farthest points) swallow every click underneath it -- a
+            // button or link behind a scribble became unreachable, not
+            // just the thin line itself. pointer-events-none here, with
+            // only the stroke's own hit-area and the control pill opting
+            // back in below, means only the ink itself (plus a little
+            // slop for easy targeting) and the pill are ever clickable.
+            <div key={id} className="group absolute pointer-events-none" style={{ left: minX, top: minY, width: w, height: h }}>
+              <svg width={w} height={h} className="overflow-visible">
+                {/* Invisible, wider hit-path -- hover/click target follows
+                    the actual drawn line instead of the bounding box, so
+                    real content between strands of a loose scribble stays
+                    reachable. Also what makes the stroke hoverable at all
+                    now that the wrapper itself is pointer-events-none --
+                    hovering it is what reveals the pill below, same as
+                    hovering the wrapper used to. */}
                 <path
-                  d={pointsToPath(el.points.map(([x, y]) => [x - minX, y - minY]))}
+                  d={strokePath}
+                  fill="none"
+                  stroke="transparent"
+                  strokeWidth={16}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  style={{ pointerEvents: 'stroke', cursor: 'pointer' }}
+                />
+                <path
+                  d={strokePath}
                   fill="none"
                   stroke={el.color || '#FF3D81'}
                   strokeWidth={3}
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  style={{ pointerEvents: 'none' }}
                 />
               </svg>
               {/* Redesigned per feedback: the old pair of bare circular
@@ -415,7 +443,7 @@ const CollabLayer = forwardRef(function CollabLayer(
                   outside the stroke's bounding box instead of on top of
                   it, reads as a control instead. */}
               <div
-                className="absolute flex items-center gap-1 rounded-full bg-bg border border-border/15 shadow-lg px-1 py-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+                className="absolute flex items-center gap-1 rounded-full bg-bg border border-border/15 shadow-lg px-1 py-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity pointer-events-auto"
                 style={{ left: w + 6, top: Math.max(h - 28, 0) }}
               >
                 {canModerate && (
