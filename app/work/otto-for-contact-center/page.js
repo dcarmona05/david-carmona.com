@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import Link from 'next/link';
 import Reveal from '@/components/Reveal';
 import HeroVideo from '@/components/HeroVideo';
@@ -6,6 +5,7 @@ import ScreenshotGallery from '@/components/ScreenshotGallery';
 import RoleResponsibilities from '@/components/RoleResponsibilities';
 import ViewTracker from '@/components/ViewTracker';
 import PageShell from '@/components/PageShell';
+import CallFlowDiagram from '@/components/CallFlowDiagram';
 import { getWorkBySlug, getNextWork } from '@/lib/work';
 
 const item = getWorkBySlug('otto-for-contact-center');
@@ -17,54 +17,6 @@ export function generateMetadata() {
 function Tag({ color, children }) {
   const colorClass = { lime: 'text-accent2', cyan: 'text-accent3', neutral: 'text-fg/50' }[color];
   return <span className={`text-[10px] font-mono uppercase tracking-wide ${colorClass}`}>{children}</span>;
-}
-
-const LANES = [
-  { key: 'customer', label: 'Customer', dot: 'bg-accent2' },
-  { key: 'banker', label: 'Banker', dot: 'bg-fg' },
-  { key: 'otto', label: 'Otto', dot: 'bg-accent3' },
-];
-
-const CALL_STEPS = [
-  { lane: 'customer', title: 'Stop payment' },
-  { lane: 'otto', title: 'Intent' },
-  { lane: 'banker', title: 'Greet & verify' },
-  { lane: 'otto', title: 'Identity' },
-  { lane: 'banker', title: 'Check details' },
-  { lane: 'customer', title: '"My paycheck?"' },
-  { lane: 'otto', title: 'Recommended action' },
-  { lane: 'banker', title: 'Answer deposit' },
-];
-
-function Swimlane() {
-  const gridCols = `76px repeat(${CALL_STEPS.length}, minmax(96px, 1fr))`;
-  return (
-    <div className="-mx-1 overflow-x-auto px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-      <div className="grid gap-x-2 gap-y-3 min-w-[860px]" style={{ gridTemplateColumns: gridCols }}>
-        {LANES.map((lane) => (
-          <Fragment key={lane.key}>
-            <div className="flex items-center gap-2 py-3">
-              <span className={`w-2 h-2 rounded-full ${lane.dot} shrink-0`} />
-              <span className="text-[10px] font-mono uppercase tracking-wide text-fg/50">{lane.label}</span>
-            </div>
-            {CALL_STEPS.map((step, i) => (
-              <div key={`${lane.key}-${i}`} className="border-t border-border/10 py-3 flex items-center">
-                {step.lane === lane.key && (
-                  <div
-                    className={`w-full rounded-md border px-2.5 py-2 ${
-                      lane.key === 'otto' ? 'border-accent3/30 bg-accent3/5' : 'border-border/10 bg-surface/[0.03]'
-                    }`}
-                  >
-                    <p className="text-xs font-display text-fg leading-snug">{step.title}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </Fragment>
-        ))}
-      </div>
-    </div>
-  );
 }
 
 function SourceStat({ value, children, source }) {
@@ -219,7 +171,7 @@ export default function OttoCaseStudyPage() {
             doesn&apos;t follow a script.
           </p>
           <div className="mt-6">
-            <Swimlane />
+            <CallFlowDiagram />
           </div>
           <p className="mt-3 text-sm text-fg/40 italic">
             Customers don&apos;t follow a script. Success depends on how well Otto reacts.
