@@ -70,8 +70,8 @@ function Swimlane() {
 function SourceStat({ value, children, source }) {
   return (
     <div className="rounded-lg border border-border/10 p-6">
-      <p className="font-display text-4xl text-accent2">{value}</p>
-      <p className="mt-2 text-fg/70 leading-snug">{children}</p>
+      <p className="font-display text-6xl font-bold text-accent2">{value}</p>
+      <p className="mt-3 text-fg/70 leading-snug">{children}</p>
       <p className="mt-3 text-xs text-fg/35">{source}</p>
     </div>
   );
@@ -244,28 +244,6 @@ export default function OttoCaseStudyPage() {
         </section>
       </Reveal>
 
-      {/* Why this matters - external research */}
-      <Reveal delay={0.11}>
-        <section className="mt-20 pt-10 border-t border-border/10">
-          <h2 className="font-display text-2xl font-bold text-fg">Why This Matters</h2>
-          <p className="mt-2 text-sm text-fg/40 max-w-2xl">
-            Independent research on generative AI assistance in customer-facing roles &mdash; the
-            broader case this design direction responds to, not a measured result of this prototype.
-          </p>
-          <div className="mt-6 grid sm:grid-cols-3 gap-4">
-            <SourceStat value="55%" source="Source: ServiceNow Newsroom, BT Group Now Assist pilot, 300 agents, June 2024">
-              less time writing case summaries
-            </SourceStat>
-            <SourceStat value="~25%" source={'Source: Brynjolfsson, Li & Raymond, "Generative AI at Work," NBER WP 31161, 2023'}>
-              fewer requests to speak to a manager
-            </SourceStat>
-            <SourceStat value="2 mo." source={'Source: Brynjolfsson, Li & Raymond, "Generative AI at Work," NBER WP 31161, 2023'}>
-              for new agents to perform like six-month veterans
-            </SourceStat>
-          </div>
-        </section>
-      </Reveal>
-
       {/* How it's built */}
       <Reveal delay={0.12}>
         <section className="mt-20 pt-10 border-t border-border/10">
@@ -303,6 +281,22 @@ export default function OttoCaseStudyPage() {
           <p className="mt-2 text-sm text-fg/40 max-w-2xl">
             Real findings from banker research sessions run on this prototype over Zoom.
           </p>
+          {item.uxrVideoUrl && (
+            <div className="mt-6">
+              <div className="rounded-lg overflow-hidden bg-black">
+                <video
+                  className="w-full h-auto"
+                  src={item.uxrVideoUrl}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              </div>
+              <p className="mt-2 text-xs text-fg/35">
+                Raw footage from the banker research sessions, Oct 1&ndash;15, 2026.
+              </p>
+            </div>
+          )}
           <div className="mt-6 grid sm:grid-cols-3 gap-4">
             <div className="rounded-lg border border-border/10 p-5">
               <Tag color="lime">01</Tag>
@@ -356,6 +350,31 @@ export default function OttoCaseStudyPage() {
           <p className="mt-2 text-sm text-fg/40 max-w-2xl">Real screens from the working prototype.</p>
           <div className="mt-6">
             <ScreenshotGallery screenshots={item.screenshots} />
+          </div>
+        </section>
+      </Reveal>
+
+      {/* Why this matters - external research. Deliberately placed second-
+          to-last (right before Outputs & Impact), per David's call: it's
+          supporting context for the case being made, not part of the main
+          narrative arc, so it reads best just before the closing outcome. */}
+      <Reveal delay={0.155}>
+        <section className="mt-20 pt-10 border-t border-border/10">
+          <h2 className="font-display text-2xl font-bold text-fg">Why This Matters</h2>
+          <p className="mt-2 text-sm text-fg/40 max-w-2xl">
+            Independent research on generative AI assistance in customer-facing roles &mdash; the
+            broader case this design direction responds to, not a measured result of this prototype.
+          </p>
+          <div className="mt-6 grid sm:grid-cols-3 gap-4">
+            <SourceStat value="55%" source="Source: ServiceNow Newsroom, BT Group Now Assist pilot, 300 agents, June 2024">
+              less time writing case summaries
+            </SourceStat>
+            <SourceStat value="~25%" source={'Source: Brynjolfsson, Li & Raymond, "Generative AI at Work," NBER WP 31161, 2023'}>
+              fewer requests to speak to a manager
+            </SourceStat>
+            <SourceStat value="2 mo." source={'Source: Brynjolfsson, Li & Raymond, "Generative AI at Work," NBER WP 31161, 2023'}>
+              for new agents to perform like six-month veterans
+            </SourceStat>
           </div>
         </section>
       </Reveal>
