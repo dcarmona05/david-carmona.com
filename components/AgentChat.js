@@ -53,6 +53,20 @@ function ChatHeader({ onMinimize, onExpand, onClose, isFull }) {
   );
 }
 
+// David's own photo on every assistant reply, so the chat reads as him
+// actually answering rather than a generic bot — the same personalization
+// already applied to the closed-bubble button's avatar.
+function Avatar() {
+  return (
+    <img
+      src="/profile.jpg"
+      alt=""
+      aria-hidden="true"
+      className="w-7 h-7 rounded-full object-cover shrink-0 mt-0.5"
+    />
+  );
+}
+
 function ChatBody({ messages, loading, scrollRef }) {
   return (
     <div
@@ -61,18 +75,28 @@ function ChatBody({ messages, loading, scrollRef }) {
       aria-label="Chat messages"
       className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
     >
-      {messages.map((m, i) => (
-        <div
-          key={i}
-          className={`max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${
-            m.role === 'user' ? 'bg-accent text-accent-ink ml-auto' : 'bg-surface/5 text-fg/80'
-          }`}
-        >
-          {m.content}
-        </div>
-      ))}
+      {messages.map((m, i) =>
+        m.role === 'user' ? (
+          <div
+            key={i}
+            className="max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed bg-accent text-accent-ink ml-auto"
+          >
+            {m.content}
+          </div>
+        ) : (
+          <div key={i} className="flex items-start gap-2 max-w-[85%]">
+            <Avatar />
+            <div className="rounded-lg px-3.5 py-2.5 text-sm leading-relaxed bg-surface/5 text-fg/80">
+              {m.content}
+            </div>
+          </div>
+        )
+      )}
       {loading && (
-        <div className="max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm bg-surface/5 text-fg/40">Thinking…</div>
+        <div className="flex items-start gap-2 max-w-[85%]">
+          <Avatar />
+          <div className="rounded-lg px-3.5 py-2.5 text-sm bg-surface/5 text-fg/40">Thinking…</div>
+        </div>
       )}
       <div ref={scrollRef} />
     </div>
