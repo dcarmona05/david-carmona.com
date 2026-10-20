@@ -526,6 +526,7 @@ const CollabLayer = forwardRef(function CollabLayer(
                 width: el.width,
                 height: el.height,
                 borderColor: el.color || '#FF3D81',
+                backgroundColor: `${el.color || '#FF3D81'}26`,
               }}
             >
               {el.text && (
@@ -564,6 +565,7 @@ const CollabLayer = forwardRef(function CollabLayer(
             width: frameDraft.width,
             height: frameDraft.height,
             borderColor: identityRef.current?.color || '#FF3D81',
+            backgroundColor: `${identityRef.current?.color || '#FF3D81'}26`,
           }}
         />
       )}
@@ -580,6 +582,7 @@ const CollabLayer = forwardRef(function CollabLayer(
               width: frameDraft.width,
               height: frameDraft.height,
               borderColor: frameDraft.color,
+              backgroundColor: `${frameDraft.color}26`,
             }}
           />
           <div
