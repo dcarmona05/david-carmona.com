@@ -383,7 +383,7 @@ export default function OttoCaseStudyPage() {
         <Reveal delay={0.16}>
           <section className="mt-20 pt-10 border-t border-border/10">
             <h2 className="font-display text-2xl font-bold text-fg">Outputs &amp; Impact</h2>
-            <blockquote className="mt-4 max-w-2xl border-l-2 border-accent pl-6">
+            <blockquote className="mt-4 border-l-2 border-accent pl-6">
               <p className="font-display text-xl sm:text-2xl text-fg leading-snug">{item.outcome}</p>
             </blockquote>
           </section>
