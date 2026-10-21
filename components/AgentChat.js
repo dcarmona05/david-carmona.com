@@ -79,7 +79,7 @@ function ChatBody({ messages, loading, scrollRef }) {
         m.role === 'user' ? (
           <div
             key={i}
-            className="max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed bg-accent text-accent-ink ml-auto"
+            className="w-fit max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed bg-accent text-accent-ink ml-auto"
           >
             {m.content}
           </div>
