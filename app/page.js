@@ -16,7 +16,6 @@ import WorkGrid from '@/components/WorkGrid';
 import ContactForm from '@/components/ContactForm';
 import HeroDoodle from '@/components/HeroDoodle';
 import PhotoFrame from '@/components/PhotoFrame';
-import PageShell from '@/components/PageShell';
 import { siteConfig } from '@/lib/site';
 import { work } from '@/lib/work';
 import { getIdentity } from '@/lib/identity';
@@ -59,9 +58,7 @@ const REGIONS = [
   { id: 'contact', label: 'Contact', width: REGION_WIDTH },
 ];
 
-// Rendered once per region id, used by both the canvas Frame layout and the
-// stacked skip-link fallback — same component, not a second copy to
-// maintain (per CANVAS_REBUILD.md's accessibility plan).
+// Rendered once per region id, inside each canvas Frame.
 function RegionContent({ id }) {
   if (id === 'home') {
     // Home now absorbs the former standalone About region — they repeated
@@ -149,7 +146,6 @@ function RegionContent({ id }) {
 export default function HomePage() {
   const stageRef = useRef(null);
   const collabRef = useRef(null);
-  const [mode, setMode] = useState('canvas');
   const [activeRegion, setActiveRegion] = useState('home');
   // Real bug found and fixed: the canvas wrapper being `h-full` (percent of
   // <main>, a flex item) rather than a definite pixel height left
@@ -240,7 +236,7 @@ export default function HomePage() {
     // Matches CanvasStage's own `panningDisabled` condition below -- the
     // library already stops wheel-panning itself while a create-tool is
     // active, so this supplemental path needs to agree, not just always pan.
-    if (mode !== 'canvas' || activeTool !== 'move') return undefined;
+    if (activeTool !== 'move') return undefined;
     function onWheel(event) {
       if (!stageRef.current) return;
       const target = event.target;
@@ -251,46 +247,15 @@ export default function HomePage() {
     }
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => window.removeEventListener('wheel', onWheel);
-  }, [mode, activeTool]);
+  }, [activeTool]);
 
   const selectTool = useCallback((tool) => {
     setActiveTool((current) => (current === tool ? 'move' : tool));
     setPendingSticker(null);
   }, []);
 
-  if (mode === 'simple') {
-    return (
-      <PageShell>
-        <div>
-          <button
-            type="button"
-            onClick={() => setMode('canvas')}
-            className="text-sm text-fg/60 hover:text-accent transition-colors"
-          >
-            &larr; Switch to the interactive canvas
-          </button>
-          <div className="mt-10 space-y-16">
-            {REGIONS.map((region) => (
-              <Frame key={region.id} id={region.id} title={region.label} stacked>
-                <RegionContent id={region.id} />
-              </Frame>
-            ))}
-          </div>
-        </div>
-      </PageShell>
-    );
-  }
-
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setMode('simple')}
-        className="sr-only focus:not-sr-only focus:fixed focus:bottom-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-accent focus:text-accent-ink focus:px-4 focus:py-2.5 focus:font-medium"
-      >
-        Skip the interactive canvas — view as a simple page
-      </button>
-
       <CanvasStage
         ref={stageRef}
         initialRegionId="home"
